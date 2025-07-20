@@ -1,0 +1,14 @@
+log:
+  level: DEBUG
+  file_log_path: ./storage/logs/
+  max_size: 500
+  max_backups: 3
+  max_age: 15
+  compress: true
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  user: guest
+  password: guest
+  
