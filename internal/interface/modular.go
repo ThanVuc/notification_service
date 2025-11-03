@@ -1,7 +1,8 @@
 package interface_modular
 
 import (
-	"notification_service/internal/domain"
+	"notification_service/internal/application"
+	"notification_service/internal/infrastructure"
 	"notification_service/internal/interface/consumer"
 	"notification_service/internal/interface/controller"
 )
@@ -12,10 +13,11 @@ type InterfaceModule struct {
 }
 
 func NewInterfaceModule(
-	domainModule *domain.DomainModule,
+	applicationModule *application.ApplicationModule,
+	infrastructureModule *infrastructure.InfrastructureModule,
 ) *InterfaceModule {
-	controllerModule := controller.NewControllerModule(domainModule)
-	consumerModule := consumer.NewConsumerModule(domainModule)
+	controllerModule := controller.NewControllerModule(applicationModule, infrastructureModule)
+	consumerModule := consumer.NewConsumerModule(applicationModule)
 
 	return &InterfaceModule{
 		ControllerModule: controllerModule,

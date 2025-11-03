@@ -1,12 +1,14 @@
 package consumer
 
-import "notification_service/internal/domain"
+import (
+	"notification_service/internal/application"
+)
 
 type ConsumerModule struct {
 }
 
 func NewConsumerModule(
-	domainModule *domain.DomainModule,
+	applicationModuel *application.ApplicationModule,
 ) *ConsumerModule {
 	return &ConsumerModule{}
 }

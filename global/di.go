@@ -2,7 +2,7 @@ package global
 
 import (
 	"context"
-	"notification_service/internal/domain"
+	"notification_service/internal/application"
 	"notification_service/internal/infrastructure"
 	"notification_service/internal/infrastructure/base"
 	"notification_service/internal/infrastructure/server"
@@ -13,7 +13,7 @@ import (
 
 type DIContainer struct {
 	configuration        *settings.Configuration
-	domainModule         *domain.DomainModule
+	applicationModule    *application.ApplicationModule
 	infrastructureModule *infrastructure.InfrastructureModule
 	interfaceModule      *interface_modular.InterfaceModule
 }
@@ -21,19 +21,19 @@ type DIContainer struct {
 func NewDIContainer() *DIContainer {
 	configuration := base.LoadConfiguration()
 	infrastructureModule := infrastructure.NewInfrastructure(configuration)
-	domainModule := domain.NewDomainModular(infrastructureModule)
-	interfaceModule := interface_modular.NewInterfaceModule(domainModule)
+	applicationModule := application.NewApplicationModule(infrastructureModule)
+	interfaceModule := interface_modular.NewInterfaceModule(applicationModule, infrastructureModule)
 
 	return &DIContainer{
-		domainModule:         domainModule,
+		applicationModule:    applicationModule,
 		infrastructureModule: infrastructureModule,
 		interfaceModule:      interfaceModule,
 		configuration:        configuration,
 	}
 }
 
-func (c *DIContainer) GetDomainModule() *domain.DomainModule {
-	return c.domainModule
+func (c *DIContainer) GetApplicationModule() *application.ApplicationModule {
+	return c.applicationModule
 }
 
 func (c *DIContainer) GetInfrastructureModule() *infrastructure.InfrastructureModule {

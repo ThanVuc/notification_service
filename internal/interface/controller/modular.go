@@ -1,12 +1,25 @@
 package controller
 
-import "notification_service/internal/domain"
+import (
+	"notification_service/internal/application"
+	"notification_service/internal/infrastructure"
+)
 
 type ControllerModule struct {
+	NotificationController *NotificationController
 }
 
 func NewControllerModule(
-	domainModule *domain.DomainModule,
+	applicationModule *application.ApplicationModule,
+	infrastructureModule *infrastructure.InfrastructureModule,
 ) *ControllerModule {
-	return &ControllerModule{}
+	logger := infrastructureModule.BaseModule.Logger
+	NotificationController := NewNotificationController(
+		applicationModule.UsecaseModular.NotificationUseCase,
+		logger,
+	)
+
+	return &ControllerModule{
+		NotificationController: NotificationController,
+	}
 }
