@@ -13,6 +13,7 @@ import (
 
 type Notification struct {
 	ID          string    `bson:"_id,omitempty" json:"id"`
+	Title       string    `bson:"title" json:"title"`
 	Message     string    `bson:"message" json:"message"`
 	Link        string    `bson:"link" json:"link"`
 	SenderId    string    `bson:"sender_id" json:"sender_id"`
