@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	interface_modular "notification_service/internal/interface"
 )
 
@@ -16,6 +17,6 @@ func NewConsumerWorker(
 	}
 }
 
-func (s *ConsumerWorker) RunConsumers() {
-
+func (s *ConsumerWorker) RunConsumers(ctx context.Context) {
+	s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
 }
