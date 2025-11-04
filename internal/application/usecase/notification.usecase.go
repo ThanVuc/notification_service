@@ -8,6 +8,8 @@ import (
 
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
+	"github.com/wagslane/go-rabbitmq"
+	"go.uber.org/zap"
 )
 
 type notificationUseCase struct {
@@ -32,4 +34,9 @@ func (n *notificationUseCase) GetNotifications(ctx context.Context, req *common.
 			},
 		},
 	}, nil
+}
+
+func (n *notificationUseCase) ConsumeScheduledNotification(d rabbitmq.Delivery) rabbitmq.Action {
+	n.logger.Info("Consumed scheduled notification", "", zap.ByteString("body", d.Body))
+	return rabbitmq.Ack
 }

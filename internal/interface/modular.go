@@ -17,7 +17,7 @@ func NewInterfaceModule(
 	infrastructureModule *infrastructure.InfrastructureModule,
 ) *InterfaceModule {
 	controllerModule := controller.NewControllerModule(applicationModule, infrastructureModule)
-	consumerModule := consumer.NewConsumerModule(applicationModule)
+	consumerModule := consumer.NewConsumerModule(applicationModule, infrastructureModule)
 
 	return &InterfaceModule{
 		ControllerModule: controllerModule,

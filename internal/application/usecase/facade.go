@@ -8,11 +8,13 @@ import (
 
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 type (
 	NotificationUseCase interface {
 		GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
+		ConsumeScheduledNotification(d rabbitmq.Delivery) rabbitmq.Action
 	}
 )
 

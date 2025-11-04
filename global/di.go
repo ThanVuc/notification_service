@@ -56,7 +56,7 @@ func (c *DIContainer) StartGrpcServer(ctx context.Context, wg *sync.WaitGroup) {
 
 func (c *DIContainer) StartComsumerWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	consumerWorker := server.NewConsumerWorker(c.interfaceModule)
-	consumerWorker.RunConsumers()
+	consumerWorker.RunConsumers(ctx)
 }
 
 func (c *DIContainer) GracefulShutdown(wg *sync.WaitGroup) {
