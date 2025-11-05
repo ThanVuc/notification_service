@@ -13,7 +13,9 @@ func NewUsecaseModule(
 		infrastructureModule.BaseModule.MongoConnector,
 		infrastructureModule.BaseModule.Logger,
 		infrastructureModule.RepoModule.NotificationRepo,
+		infrastructureModule.BaseModule.FirebaseApp,
 	)
+
 	return &UsecaseModule{
 		NotificationUseCase: notificationUseCase,
 	}
