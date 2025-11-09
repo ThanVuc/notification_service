@@ -11,7 +11,6 @@ import (
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
 	"github.com/wagslane/go-rabbitmq"
-	"go.uber.org/zap"
 )
 
 type notificationUseCase struct {
@@ -40,7 +39,6 @@ func (n *notificationUseCase) GetNotifications(ctx context.Context, req *common.
 }
 
 func (n *notificationUseCase) ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
-	n.logger.Info("Consumed scheduled notification", "", zap.ByteString("body", d.Body))
 	messagingClient, err := n.firebaseApp.Messaging(ctx)
 	if err != nil {
 		return rabbitmq.NackRequeue

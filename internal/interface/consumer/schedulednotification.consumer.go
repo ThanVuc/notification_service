@@ -35,7 +35,7 @@ func (s *ScheduledNotificationConsumer) ScheduledNotificationConsume(ctx context
 		eventbus.ExchangeTypeTopic,
 		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.ROUTING_KEY,
 		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.QUEUE,
-		3,
+		1,
 	)
 	s.logger.Info("Starting Scheduled Notification consumer", "")
 	err := consumer.Consume(ctx, func(d rabbitmq.Delivery) rabbitmq.Action {

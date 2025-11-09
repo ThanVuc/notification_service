@@ -16,7 +16,6 @@ type User struct {
 	UserID    string        `bson:"user_id" json:"user_id"`
 	FCMToken  string        `bson:"fcm_token" json:"fcm_token"`
 	DeviceID  string        `bson:"device_id" json:"device_id"`
-	UserAgent string        `bson:"user_agent" json:"user_agent"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time     `bson:"updated_at" json:"updated_at"`
 }
@@ -33,10 +32,10 @@ func CreateUserCollection(
 	userValidator := bson.M{
 		"$jsonSchema": bson.M{
 			"bsonType": "object",
-			"required": []string{"_id", "user_id", "fcm_token", "device_id", "created_at", "update_at"},
+			"required": []string{"_id", "user_id", "fcm_token", "device_id", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
-					"bsonType":    "string",
+					"bsonType":    []string{"string", "objectId"},
 					"description": "ID",
 				},
 				"user_id": bson.M{
@@ -65,8 +64,8 @@ func CreateUserCollection(
 
 	userIdxs := []mongo.IndexModel{
 		{
-			Keys:    bson.D{{Key: "user_id", Value: 1}},
-			Options: options.Index().SetName("idx_user"),
+			Keys:    bson.D{{Key: "user_id", Value: 1}, {Key: "device_id", Value: 1}},
+			Options: options.Index().SetUnique(true),
 		},
 	}
 

@@ -52,6 +52,7 @@ func (c *DIContainer) StartGrpcServer(ctx context.Context, wg *sync.WaitGroup) {
 	)
 
 	notificationServer.RunServers(ctx, wg)
+	c.infrastructureModule.BaseModule.Logger.Info("gRPC server started", "")
 }
 
 func (c *DIContainer) StartComsumerWorkers(ctx context.Context, wg *sync.WaitGroup) {

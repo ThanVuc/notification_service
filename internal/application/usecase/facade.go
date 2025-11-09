@@ -17,6 +17,10 @@ type (
 		GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
 		ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
+
+	UserNotificationUseCase interface {
+		UpsertUserFCMToken(ctx context.Context, req *notification_service.UpsertUserFCMTokenRequest) (*common.EmptyResponse, error)
+	}
 )
 
 func NewNotificationUseCase(
@@ -30,5 +34,17 @@ func NewNotificationUseCase(
 		logger:           logger,
 		notificationRepo: notificationRepo,
 		firebaseApp:      firebaseApp,
+	}
+}
+
+func NewUserNotificationUseCase(
+	mongodbConnector *mongolib.MongoConnector,
+	logger log.Logger,
+	userRepo repos.UserNotificationRepo,
+) UserNotificationUseCase {
+	return &userNotificationUseCase{
+		mongodbConnector: mongodbConnector,
+		logger:           logger,
+		userRepo:         userRepo,
 	}
 }
