@@ -7,6 +7,7 @@ import (
 
 	"github.com/thanvuc/go-core-lib/eventbus"
 	"github.com/thanvuc/go-core-lib/log"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 type ScheduledNotificationConsumer struct {
@@ -34,10 +35,13 @@ func (s *ScheduledNotificationConsumer) ScheduledNotificationConsume(ctx context
 		eventbus.ExchangeTypeTopic,
 		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.ROUTING_KEY,
 		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.QUEUE,
-		3,
+		1,
 	)
 	s.logger.Info("Starting Scheduled Notification consumer", "")
-	err := consumer.Consume(ctx, s.notificationUsecase.ConsumeScheduledNotification)
+	err := consumer.Consume(ctx, func(d rabbitmq.Delivery) rabbitmq.Action {
+		return s.notificationUsecase.ConsumeScheduledNotification(ctx, d)
+	})
+
 	if err != nil {
 		s.logger.Error("Failed to start ScheduledNotification consumer", "")
 		return

@@ -6,16 +6,18 @@ import (
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
 
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/messaging"
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
 	"github.com/wagslane/go-rabbitmq"
-	"go.uber.org/zap"
 )
 
 type notificationUseCase struct {
 	mongodbConnector *mongolib.MongoConnector
 	logger           log.Logger
 	notificationRepo repos.NotificationRepo
+	firebaseApp      *firebase.App
 }
 
 func (n *notificationUseCase) GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error) {
@@ -36,7 +38,13 @@ func (n *notificationUseCase) GetNotifications(ctx context.Context, req *common.
 	}, nil
 }
 
-func (n *notificationUseCase) ConsumeScheduledNotification(d rabbitmq.Delivery) rabbitmq.Action {
-	n.logger.Info("Consumed scheduled notification", "", zap.ByteString("body", d.Body))
+func (n *notificationUseCase) ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
+	messagingClient, err := n.firebaseApp.Messaging(ctx)
+	if err != nil {
+		return rabbitmq.NackRequeue
+	}
+
+	messagingClient.Send(ctx, &messaging.Message{})
+
 	return rabbitmq.Ack
 }

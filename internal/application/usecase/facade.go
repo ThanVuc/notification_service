@@ -6,6 +6,7 @@ import (
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
 
+	firebase "firebase.google.com/go/v4"
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
 	"github.com/wagslane/go-rabbitmq"
@@ -14,7 +15,11 @@ import (
 type (
 	NotificationUseCase interface {
 		GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
-		ConsumeScheduledNotification(d rabbitmq.Delivery) rabbitmq.Action
+		ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
+	}
+
+	UserNotificationUseCase interface {
+		UpsertUserFCMToken(ctx context.Context, req *notification_service.UpsertUserFCMTokenRequest) (*common.EmptyResponse, error)
 	}
 )
 
@@ -22,10 +27,24 @@ func NewNotificationUseCase(
 	mongodbConnector *mongolib.MongoConnector,
 	logger log.Logger,
 	notificationRepo repos.NotificationRepo,
+	firebaseApp *firebase.App,
 ) NotificationUseCase {
 	return &notificationUseCase{
 		mongodbConnector: mongodbConnector,
 		logger:           logger,
 		notificationRepo: notificationRepo,
+		firebaseApp:      firebaseApp,
+	}
+}
+
+func NewUserNotificationUseCase(
+	mongodbConnector *mongolib.MongoConnector,
+	logger log.Logger,
+	userRepo repos.UserNotificationRepo,
+) UserNotificationUseCase {
+	return &userNotificationUseCase{
+		mongodbConnector: mongodbConnector,
+		logger:           logger,
+		userRepo:         userRepo,
 	}
 }

@@ -16,10 +16,13 @@ func main() {
 	diContainer := global.NewDIContainer()
 	logger := diContainer.GetInfrastructureModule().BaseModule.Logger
 	// run consumer in another goroutine
-	cmd.RunConsumer(ctx, &wg, diContainer)
+	go cmd.RunConsumer(ctx, &wg, diContainer)
 
 	// run grpc server in main goroutine
-	cmd.RunGrpcServer(ctx, &wg, diContainer)
+	go cmd.RunGrpcServer(ctx, &wg, diContainer)
+
+	// run console test in main goroutine
+	// cmd.RunConsoleTest(ctx, diContainer.GetInfrastructureModule())
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)

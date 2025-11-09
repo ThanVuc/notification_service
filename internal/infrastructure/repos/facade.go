@@ -1,6 +1,8 @@
 package repos
 
 import (
+	"context"
+	"notification_service/internal/core/entity"
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
 
@@ -12,6 +14,10 @@ type (
 	NotificationRepo interface {
 		GetNotificationsByRecipientID(request *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
 	}
+
+	UserNotificationRepo interface {
+		UpsertUserNotification(ctx context.Context, user *entity.User) error
+	}
 )
 
 func NewNotificationRepo(
@@ -19,6 +25,16 @@ func NewNotificationRepo(
 	logger log.Logger,
 ) NotificationRepo {
 	return &notificationRepo{
+		mongoConnector: mongoConnector,
+		logger:         logger,
+	}
+}
+
+func NewUserNotificationRepo(
+	mongoConnector *mongolib.MongoConnector,
+	logger log.Logger,
+) UserNotificationRepo {
+	return &userNotificationRepo{
 		mongoConnector: mongoConnector,
 		logger:         logger,
 	}

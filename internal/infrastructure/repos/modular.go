@@ -3,7 +3,8 @@ package repos
 import "notification_service/internal/infrastructure/base"
 
 type RepoModule struct {
-	NotificationRepo NotificationRepo
+	NotificationRepo     NotificationRepo
+	UserNotificationRepo UserNotificationRepo
 }
 
 func NewRepoModule(
@@ -14,7 +15,13 @@ func NewRepoModule(
 		baseModule.Logger,
 	)
 
+	userNotificationRepo := NewUserNotificationRepo(
+		baseModule.MongoConnector,
+		baseModule.Logger,
+	)
+
 	return &RepoModule{
-		NotificationRepo: notificationRepo,
+		NotificationRepo:     notificationRepo,
+		UserNotificationRepo: userNotificationRepo,
 	}
 }

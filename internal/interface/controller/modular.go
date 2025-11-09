@@ -6,7 +6,8 @@ import (
 )
 
 type ControllerModule struct {
-	NotificationController *NotificationController
+	NotificationController     *NotificationController
+	UserNotificationController *UserNotificationController
 }
 
 func NewControllerModule(
@@ -19,7 +20,13 @@ func NewControllerModule(
 		logger,
 	)
 
+	UserNotificationController := NewUserNotificationController(
+		applicationModule.UsecaseModular.UserNotificationUseCase,
+		logger,
+	)
+
 	return &ControllerModule{
-		NotificationController: NotificationController,
+		NotificationController:     NotificationController,
+		UserNotificationController: UserNotificationController,
 	}
 }

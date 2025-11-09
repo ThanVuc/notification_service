@@ -19,6 +19,8 @@ type Notification struct {
 	SenderId    string    `bson:"sender_id" json:"sender_id"`
 	ReceiverIds []string  `bson:"receiver_ids" json:"receiver_ids"`
 	IsRead      bool      `bson:"is_read" json:"is_read"`
+	IconKey     *string   `bson:"icon_key" json:"icon_key"`
+	ImgUrl      *string   `bson:"noti_url" json:"noti_url"`
 	CreatedAt   time.Time `bson:"created_at" json:"created_at"`
 	UpdatedAt   time.Time `bson:"updated_at" json:"updated_at"`
 }
@@ -38,7 +40,7 @@ func CreateNotificationCollection(
 			"required": []string{"_id", "message", "sender_id", "receiver_ids", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
-					"bsonType":    "string",
+					"bsonType":    []string{"string", "objectId"},
 					"description": "ID",
 				},
 				"message": bson.M{
