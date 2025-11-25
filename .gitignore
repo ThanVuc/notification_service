@@ -36,6 +36,7 @@ Thumbs.db
 dev.yaml
 qa.yaml
 prod.yaml
+firebase.json
 
 # backup files
 /backup
