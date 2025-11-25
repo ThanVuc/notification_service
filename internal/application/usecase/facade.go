@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"notification_service/internal/application/mapper"
 	"notification_service/internal/infrastructure/repos"
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
@@ -21,6 +22,10 @@ type (
 	UserNotificationUseCase interface {
 		UpsertUserFCMToken(ctx context.Context, req *notification_service.UpsertUserFCMTokenRequest) (*common.EmptyResponse, error)
 	}
+
+	ScheduledWorkerUseCase interface {
+		ProcessScheduledNotifications(ctx context.Context) error
+	}
 )
 
 func NewNotificationUseCase(
@@ -28,12 +33,14 @@ func NewNotificationUseCase(
 	logger log.Logger,
 	notificationRepo repos.NotificationRepo,
 	firebaseApp *firebase.App,
+	notificationMapper mapper.NotificationMapper,
 ) NotificationUseCase {
 	return &notificationUseCase{
-		mongodbConnector: mongodbConnector,
-		logger:           logger,
-		notificationRepo: notificationRepo,
-		firebaseApp:      firebaseApp,
+		mongodbConnector:   mongodbConnector,
+		logger:             logger,
+		notificationRepo:   notificationRepo,
+		firebaseApp:        firebaseApp,
+		notificationMapper: notificationMapper,
 	}
 }
 
@@ -45,6 +52,20 @@ func NewUserNotificationUseCase(
 	return &userNotificationUseCase{
 		mongodbConnector: mongodbConnector,
 		logger:           logger,
+		userRepo:         userRepo,
+	}
+}
+
+func NewScheduledWorkerUseCase(
+	logger log.Logger,
+	notificationRepo repos.NotificationRepo,
+	firebaseApp *firebase.App,
+	userRepo repos.UserNotificationRepo,
+) ScheduledWorkerUseCase {
+	return &scheduledWorkerUsecase{
+		logger:           logger,
+		notificationRepo: notificationRepo,
+		firebaseApp:      firebaseApp,
 		userRepo:         userRepo,
 	}
 }

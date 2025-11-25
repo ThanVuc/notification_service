@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"math"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -78,4 +79,31 @@ func ToBoolPointer(b bool) *bool {
 
 func ToStringPointer(s string) *string {
 	return &s
+}
+
+func FromTimeStampToTimePtr(timestamp *int64) *time.Time {
+	if timestamp == nil {
+		return nil
+	}
+	// 13 digits timestamp
+	t := time.UnixMilli(*timestamp)
+	return &t
+}
+
+func FromTimeStampToTime(timestamp int64) time.Time {
+	// 13 digits timestamp
+	return time.UnixMilli(timestamp)
+}
+
+func FromTimeToTimeStamp(t time.Time) int64 {
+	return t.UnixMilli()
+}
+
+func FromTimePtrToTimeStamp(t *time.Time) *int64 {
+	if t == nil {
+		return nil
+	}
+
+	timestamp := t.UnixMilli()
+	return &timestamp
 }

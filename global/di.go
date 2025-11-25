@@ -50,14 +50,19 @@ func (c *DIContainer) StartGrpcServer(ctx context.Context, wg *sync.WaitGroup) {
 		c.infrastructureModule.BaseModule.Logger,
 		c.interfaceModule.ControllerModule,
 	)
-
-	notificationServer.RunServers(ctx, wg)
 	c.infrastructureModule.BaseModule.Logger.Info("gRPC server started", "")
+	notificationServer.RunServers(ctx, wg)
 }
 
 func (c *DIContainer) StartComsumerWorkers(ctx context.Context, wg *sync.WaitGroup) {
 	consumerWorker := server.NewConsumerWorker(c.interfaceModule)
 	consumerWorker.RunConsumers(ctx)
+}
+
+func (c *DIContainer) StartWorker(ctx context.Context, wg *sync.WaitGroup) {
+	workerServer := server.NewWorker(c.interfaceModule)
+	c.infrastructureModule.BaseModule.Logger.Info("Worker started", "")
+	workerServer.RunWorkers()
 }
 
 func (c *DIContainer) GracefulShutdown(wg *sync.WaitGroup) {

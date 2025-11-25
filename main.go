@@ -18,6 +18,9 @@ func main() {
 	// run consumer in another goroutine
 	go cmd.RunConsumer(ctx, &wg, diContainer)
 
+	// run worker in another goroutine
+	go cmd.RunWorkerServer(ctx, &wg, diContainer)
+
 	// run grpc server in main goroutine
 	go cmd.RunGrpcServer(ctx, &wg, diContainer)
 

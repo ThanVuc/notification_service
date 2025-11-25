@@ -15,3 +15,7 @@ const (
 const (
 	NOTIFICATION_EXCHANGE eventbus.ExchangeName = SCHEDULED_NOTIFICATION + EXCHANGE
 )
+
+const (
+	SCHEDULED_CONSUMER_NUMBER = 2
+)

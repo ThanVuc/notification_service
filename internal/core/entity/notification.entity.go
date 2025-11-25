@@ -12,17 +12,21 @@ import (
 )
 
 type Notification struct {
-	ID          string    `bson:"_id,omitempty" json:"id"`
-	Title       string    `bson:"title" json:"title"`
-	Message     string    `bson:"message" json:"message"`
-	Link        string    `bson:"link" json:"link"`
-	SenderId    string    `bson:"sender_id" json:"sender_id"`
-	ReceiverIds []string  `bson:"receiver_ids" json:"receiver_ids"`
-	IsRead      bool      `bson:"is_read" json:"is_read"`
-	IconKey     *string   `bson:"icon_key" json:"icon_key"`
-	ImgUrl      *string   `bson:"noti_url" json:"noti_url"`
-	CreatedAt   time.Time `bson:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `bson:"updated_at" json:"updated_at"`
+	ID              string     `bson:"_id,omitempty" json:"id"`
+	Title           string     `bson:"title" json:"title"`
+	Message         string     `bson:"message" json:"message"`
+	Link            *string    `bson:"link" json:"link"`
+	SenderId        string     `bson:"sender_id" json:"sender_id"`
+	ReceiverIds     []string   `bson:"receiver_ids" json:"receiver_ids"`
+	IsRead          bool       `bson:"is_read" json:"is_read"`
+	TriggerAt       *time.Time `bson:"trigger_at" json:"trigger_at"`
+	ImgUrl          *string    `bson:"img_url" json:"img_url"`
+	IsEmailSent     bool       `bson:"is_email_sent" json:"is_email_sent"`
+	IsActive        bool       `bson:"is_active" json:"is_active"`
+	CreatedAt       time.Time  `bson:"created_at" json:"created_at"`
+	UpdatedAt       time.Time  `bson:"updated_at" json:"updated_at"`
+	CorrelationId   string     `bson:"correlation_id,omitempty" json:"correlation_id,omitempty"`
+	CorrelationType int32      `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
 }
 
 func (n *Notification) CollectionName() string {

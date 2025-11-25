@@ -22,16 +22,24 @@ const (
 )
 
 type Notification struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
-	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp"`
-	SenderId      string                 `protobuf:"bytes,5,opt,name=sender_id,json=senderId,proto3" json:"sender_id"`
-	ReceiverId    string                 `protobuf:"bytes,6,opt,name=receiver_id,json=receiverId,proto3" json:"receiver_id"`
-	IsRead        bool                   `protobuf:"varint,7,opt,name=is_read,json=isRead,proto3" json:"is_read"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
+	Title           string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title"`
+	Message         string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message"`
+	SenderId        string                 `protobuf:"bytes,4,opt,name=sender_id,json=senderId,proto3" json:"sender_id"`
+	ReceiverIds     []string               `protobuf:"bytes,5,rep,name=receiver_ids,json=receiverIds,proto3" json:"receiver_ids"`
+	IsRead          bool                   `protobuf:"varint,6,opt,name=is_read,json=isRead,proto3" json:"is_read"`
+	Link            *string                `protobuf:"bytes,7,opt,name=link,proto3,oneof" json:"link"`
+	CreatedAt       int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at"`
+	UpdateAt        int64                  `protobuf:"varint,9,opt,name=update_at,json=updateAt,proto3" json:"update_at"`
+	TriggerAt       *int64                 `protobuf:"varint,10,opt,name=trigger_at,json=triggerAt,proto3,oneof" json:"trigger_at"`
+	ImageUrl        *string                `protobuf:"bytes,11,opt,name=image_url,json=imageUrl,proto3,oneof" json:"image_url"`
+	IsEmailSent     bool                   `protobuf:"varint,12,opt,name=is_email_sent,json=isEmailSent,proto3" json:"is_email_sent"`
+	IsActive        bool                   `protobuf:"varint,13,opt,name=is_active,json=isActive,proto3" json:"is_active"`
+	CorrelationId   string                 `protobuf:"bytes,14,opt,name=correlation_id,json=correlationId,proto3" json:"correlation_id"`
+	CorrelationType int32                  `protobuf:"varint,15,opt,name=correlation_type,json=correlationType,proto3" json:"correlation_type"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Notification) Reset() {
@@ -85,13 +93,6 @@ func (x *Notification) GetMessage() string {
 	return ""
 }
 
-func (x *Notification) GetTimestamp() int64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
 func (x *Notification) GetSenderId() string {
 	if x != nil {
 		return x.SenderId
@@ -99,11 +100,11 @@ func (x *Notification) GetSenderId() string {
 	return ""
 }
 
-func (x *Notification) GetReceiverId() string {
+func (x *Notification) GetReceiverIds() []string {
 	if x != nil {
-		return x.ReceiverId
+		return x.ReceiverIds
 	}
-	return ""
+	return nil
 }
 
 func (x *Notification) GetIsRead() bool {
@@ -113,20 +114,97 @@ func (x *Notification) GetIsRead() bool {
 	return false
 }
 
+func (x *Notification) GetLink() string {
+	if x != nil && x.Link != nil {
+		return *x.Link
+	}
+	return ""
+}
+
+func (x *Notification) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *Notification) GetUpdateAt() int64 {
+	if x != nil {
+		return x.UpdateAt
+	}
+	return 0
+}
+
+func (x *Notification) GetTriggerAt() int64 {
+	if x != nil && x.TriggerAt != nil {
+		return *x.TriggerAt
+	}
+	return 0
+}
+
+func (x *Notification) GetImageUrl() string {
+	if x != nil && x.ImageUrl != nil {
+		return *x.ImageUrl
+	}
+	return ""
+}
+
+func (x *Notification) GetIsEmailSent() bool {
+	if x != nil {
+		return x.IsEmailSent
+	}
+	return false
+}
+
+func (x *Notification) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *Notification) GetCorrelationId() string {
+	if x != nil {
+		return x.CorrelationId
+	}
+	return ""
+}
+
+func (x *Notification) GetCorrelationType() int32 {
+	if x != nil {
+		return x.CorrelationType
+	}
+	return 0
+}
+
 var File_notification_service_common_notification_proto protoreflect.FileDescriptor
 
 const file_notification_service_common_notification_proto_rawDesc = "" +
 	"\n" +
-	".notification_service/common.notification.proto\x12\fnotification\"\xc3\x01\n" +
+	".notification_service/common.notification.proto\x12\fnotification\"\xfb\x03\n" +
 	"\fNotification\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12\x1b\n" +
-	"\tsender_id\x18\x05 \x01(\tR\bsenderId\x12\x1f\n" +
-	"\vreceiver_id\x18\x06 \x01(\tR\n" +
-	"receiverId\x12\x17\n" +
-	"\ais_read\x18\a \x01(\bR\x06isReadB\x1cZ\x1aproto/notification_serviceb\x06proto3"
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x1b\n" +
+	"\tsender_id\x18\x04 \x01(\tR\bsenderId\x12!\n" +
+	"\freceiver_ids\x18\x05 \x03(\tR\vreceiverIds\x12\x17\n" +
+	"\ais_read\x18\x06 \x01(\bR\x06isRead\x12\x17\n" +
+	"\x04link\x18\a \x01(\tH\x00R\x04link\x88\x01\x01\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\b \x01(\x03R\tcreatedAt\x12\x1b\n" +
+	"\tupdate_at\x18\t \x01(\x03R\bupdateAt\x12\"\n" +
+	"\n" +
+	"trigger_at\x18\n" +
+	" \x01(\x03H\x01R\ttriggerAt\x88\x01\x01\x12 \n" +
+	"\timage_url\x18\v \x01(\tH\x02R\bimageUrl\x88\x01\x01\x12\"\n" +
+	"\ris_email_sent\x18\f \x01(\bR\visEmailSent\x12\x1b\n" +
+	"\tis_active\x18\r \x01(\bR\bisActive\x12%\n" +
+	"\x0ecorrelation_id\x18\x0e \x01(\tR\rcorrelationId\x12)\n" +
+	"\x10correlation_type\x18\x0f \x01(\x05R\x0fcorrelationTypeB\a\n" +
+	"\x05_linkB\r\n" +
+	"\v_trigger_atB\f\n" +
+	"\n" +
+	"_image_urlB\x1cZ\x1aproto/notification_serviceb\x06proto3"
 
 var (
 	file_notification_service_common_notification_proto_rawDescOnce sync.Once
@@ -157,6 +235,7 @@ func file_notification_service_common_notification_proto_init() {
 	if File_notification_service_common_notification_proto != nil {
 		return
 	}
+	file_notification_service_common_notification_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
