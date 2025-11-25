@@ -5,18 +5,19 @@ import (
 	interface_modular "notification_service/internal/interface"
 )
 
-type ConsumerWorker struct {
+type Worker struct {
 	interfaceModule *interface_modular.InterfaceModule
 }
 
-func NewConsumerWorker(
+func NewWorker(
 	interfaceModule *interface_modular.InterfaceModule,
-) *ConsumerWorker {
-	return &ConsumerWorker{
+) *Worker {
+	return &Worker{
 		interfaceModule: interfaceModule,
 	}
 }
 
-func (s *ConsumerWorker) RunConsumers(ctx context.Context) {
-	s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
+func (s *Worker) RunWorkers() {
+	ctx := context.Background()
+	go s.interfaceModule.WorkerModule.ScheduledNotificationWorker.RunScheduledNotifications(ctx)
 }

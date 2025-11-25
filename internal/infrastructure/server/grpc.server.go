@@ -6,6 +6,7 @@ import (
 	"net"
 	"notification_service/internal/interface/controller"
 	"notification_service/pkg/settings"
+	"notification_service/proto/notification_service"
 	"sync"
 
 	"github.com/thanvuc/go-core-lib/log"
@@ -33,7 +34,7 @@ func NewNotificationServer(
 
 func (ns *NotificationServer) RunServers(ctx context.Context, wg *sync.WaitGroup) {
 	wg.Add(1)
-	go ns.runServiceServer(ctx, wg)
+	ns.runServiceServer(ctx, wg)
 }
 
 // create server factory
@@ -41,6 +42,8 @@ func (ns *NotificationServer) createServer() *grpc.Server {
 	server := grpc.NewServer()
 
 	// register services here
+	notification_service.RegisterNotificationServiceServer(server, ns.controllerModule.NotificationController)
+	notification_service.RegisterUserNotificationServiceServer(server, ns.controllerModule.UserNotificationController)
 
 	return server
 }

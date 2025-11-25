@@ -47,6 +47,7 @@ type Mongo struct {
 }
 
 type Firebase struct {
+	Path string `mapstructure:"path" json:"path" yaml:"path"`
 }
 
 type Email struct {
