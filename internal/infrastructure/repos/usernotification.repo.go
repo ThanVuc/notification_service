@@ -34,3 +34,23 @@ func (r *userNotificationRepo) UpsertUserNotification(ctx context.Context, user 
 	_, err := collection.UpdateOne(ctx, filter, update, options.UpdateOne().SetUpsert(true))
 	return err
 }
+
+func (r *userNotificationRepo) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*entity.User, error) {
+	collection := r.mongoConnector.GetCollection(constant.CollectionUser)
+	filter := bson.M{
+		"user_id": bson.M{
+			"$in": userIDs,
+		},
+	}
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var users []*entity.User
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, err
+	}
+	return users, nil
+}

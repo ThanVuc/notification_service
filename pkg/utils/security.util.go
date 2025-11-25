@@ -38,3 +38,21 @@ func WithSafePanicConsumer(ctx context.Context, logger log.Logger, f func(contex
 
 	f(ctx)
 }
+
+func WithSafePanicSimple(
+	ctx context.Context,
+	logger log.Logger,
+	f func(context.Context) error,
+) error {
+	requestId := GetRequestIDFromOutgoingContext(ctx)
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error("Recovered from panic",
+				requestId,
+				zap.Any("error", r),
+			)
+		}
+	}()
+
+	return f(ctx)
+}

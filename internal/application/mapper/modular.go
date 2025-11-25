@@ -1,8 +1,12 @@
 package mapper
 
 type MapperModule struct {
+	NotificationMapper NotificationMapper
 }
 
 func NewMapperModule() *MapperModule {
-	return &MapperModule{}
+	notificationMapper := NewNotificationMapper()
+	return &MapperModule{
+		NotificationMapper: notificationMapper,
+	}
 }
