@@ -56,7 +56,6 @@ func (n *notificationUseCase) ConsumeScheduledNotification(ctx context.Context, 
 		n.logger.Error("Failed to save scheduled notification", requestId, zap.Error(err))
 		return rabbitmq.NackRequeue
 	}
-	n.logger.Info("Successfully processed scheduled notification", notificationEntity.Message)
 
 	return rabbitmq.Ack
 }
