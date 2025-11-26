@@ -32,7 +32,7 @@ type RabbitMQ struct {
 
 type Server struct {
 	Host             string `mapstructure:"host" json:"host" yaml:"host"`
-	NotificationPort int    `mapstructure:"personal_schedule_port" json:"personal_schedule_port" yaml:"personal_schedule_port"`
+	NotificationPort int    `mapstructure:"notification_port" json:"notification_port" yaml:"notification_port"`
 	MaxRecvMsgSize   int    `mapstructure:"max_recv_msg_size" json:"max_recv_msg_size" yaml:"max_recv_msg_size"`
 	MaxSendMsgSize   int    `mapstructure:"max_send_msg_size" json:"max_send_msg_size" yaml:"max_send_msg_size"`
 	KeepaliveTime    int    `mapstructure:"keepalive_time" json:"keepalive_time" yaml:"keepalive_time"`          // in seconds

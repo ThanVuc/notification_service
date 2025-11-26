@@ -38,8 +38,6 @@ func (r *notificationRepo) SaveNotification(ctx context.Context, notification *e
 }
 
 func (r *notificationRepo) GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error) {
-	println(startTime.String())
-	println(endTime.String())
 	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
 	filter := bson.M{
 		"trigger_at": bson.M{
