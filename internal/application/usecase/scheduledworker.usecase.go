@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	dbFetchInterval           = 15 * time.Minute
+	dbFetchInterval           = 5 * time.Minute
 	notificationCheckInterval = 1 * time.Minute
 )
 
@@ -108,11 +108,9 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 						},
 					}
 
-					response, err := firebaseClient.Send(ctx, message)
+					_, err := firebaseClient.Send(ctx, message)
 					if err != nil {
 						s.logger.Error("Error sending scheduled notification", "", zap.Error(err))
-					} else {
-						s.logger.Info("Successfully sent scheduled notification", "", zap.String("response", response))
 					}
 				}
 			}
@@ -127,8 +125,6 @@ func (s *scheduledWorkerUsecase) fetchScheduledNotifications(
 	ctx context.Context,
 	notificationMap map[string][]*entity.Notification,
 ) error {
-	s.logger.Info("Fetching scheduled notifications from database", "")
-
 	now := time.Now().UTC()
 
 	notifications, err := s.notificationRepo.GetNotificationsWithinTimeRange(

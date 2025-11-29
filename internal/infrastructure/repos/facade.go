@@ -9,6 +9,7 @@ import (
 
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type (
@@ -16,7 +17,7 @@ type (
 		GetNotificationsByRecipientID(request *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
 		SaveNotification(ctx context.Context, notification *entity.Notification) error
 		GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error)
-		InvalidateNotifications(ctx context.Context, notificationIDs []string) error
+		InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error
 	}
 
 	UserNotificationRepo interface {
