@@ -35,7 +35,7 @@ func CreateUserCollection(
 			"required": []string{"_id", "user_id", "fcm_token", "device_id", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
-					"bsonType":    []string{"string", "objectId"},
+					"bsonType":    []string{"objectId"},
 					"description": "ID",
 				},
 				"user_id": bson.M{
