@@ -27,6 +27,7 @@ func (r *notificationRepo) GetNotificationsByRecipientID(request *common.IDReque
 
 func (r *notificationRepo) SaveNotification(ctx context.Context, notification *entity.Notification) error {
 	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+
 	_, err := collection.UpdateOne(
 		ctx,
 		bson.M{"_id": notification.ID},
@@ -59,7 +60,7 @@ func (r *notificationRepo) GetNotificationsWithinTimeRange(ctx context.Context, 
 	}
 
 	// Mark notifications as inactive after fetching
-	notificationIDs := make([]string, len(notifications))
+	notificationIDs := make([]bson.ObjectID, len(notifications))
 	for i, notification := range notifications {
 		notificationIDs[i] = notification.ID
 	}
@@ -71,7 +72,7 @@ func (r *notificationRepo) GetNotificationsWithinTimeRange(ctx context.Context, 
 	return notifications, nil
 }
 
-func (r *notificationRepo) InvalidateNotifications(ctx context.Context, notificationIDs []string) error {
+func (r *notificationRepo) InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error {
 	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
 	_, err := collection.UpdateMany(
 		ctx,

@@ -4,13 +4,21 @@ import (
 	"notification_service/internal/core/entity"
 	"notification_service/pkg/utils"
 	"notification_service/proto/common"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type notificationMapper struct{}
 
 func (n *notificationMapper) FromProtoToEntity(protoNotification *common.Notification) *entity.Notification {
+	objectId, err := bson.ObjectIDFromHex(*protoNotification.Id)
+
+	if err != nil {
+		objectId = bson.NewObjectID()
+	}
+
 	return &entity.Notification{
-		ID:              *protoNotification.Id,
+		ID:              objectId,
 		Title:           protoNotification.Title,
 		Message:         protoNotification.Message,
 		SenderId:        protoNotification.SenderId,
