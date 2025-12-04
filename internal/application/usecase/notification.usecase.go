@@ -41,17 +41,17 @@ func (n *notificationUseCase) GetNotifications(ctx context.Context, req *common.
 }
 
 func (n *notificationUseCase) ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
-	notificationBody := new(common.Notification)
+	notificationsBody := common.Notifications{}
 	requestId := d.Headers["request_id"].(string)
-	err := proto.Unmarshal(d.Body, notificationBody)
+	err := proto.Unmarshal(d.Body, &notificationsBody)
 	if err != nil {
 		n.logger.Error("Failed to unmarshal scheduled notification", requestId, zap.Error(err))
 		return rabbitmq.NackDiscard
 	}
 
 	// Process the scheduled notification
-	notificationEntity := n.notificationMapper.FromProtoToEntity(notificationBody)
-	err = n.notificationRepo.SaveNotification(ctx, notificationEntity)
+	notificationEntities := n.notificationMapper.FromProtoListToEntities(notificationsBody.Notifications, false)
+	err = n.notificationRepo.UpsertNotifications(ctx, notificationEntities)
 	if err != nil {
 		n.logger.Error("Failed to save scheduled notification", requestId, zap.Error(err))
 		return rabbitmq.NackRequeue

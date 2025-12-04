@@ -25,14 +25,13 @@ func (r *notificationRepo) GetNotificationsByRecipientID(request *common.IDReque
 	return nil, nil
 }
 
-func (r *notificationRepo) SaveNotification(ctx context.Context, notification *entity.Notification) error {
+func (r *notificationRepo) UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error {
 	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
 
-	_, err := collection.UpdateOne(
+	_, err := collection.UpdateMany(
 		ctx,
-		bson.M{"_id": notification.ID},
-		bson.M{"$set": notification},
-		options.UpdateOne().SetUpsert(true),
+		notifications,
+		options.UpdateMany().SetUpsert(true),
 	)
 
 	return err

@@ -33,8 +33,8 @@ func (s *ScheduledNotificationConsumer) ScheduledNotificationConsume(ctx context
 		s.connector,
 		interface_constant.NOTIFICATION_EXCHANGE,
 		eventbus.ExchangeTypeTopic,
-		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.ROUTING_KEY,
-		interface_constant.SCHEDULED_NOTIFICATION+interface_constant.QUEUE,
+		interface_constant.NOTIFICATION_ROUTING_KEY,
+		interface_constant.NOTIFICATION_QUEUE,
 		interface_constant.SCHEDULED_CONSUMER_NUMBER,
 	)
 	s.logger.Info("Starting Scheduled Notification consumer", "")
