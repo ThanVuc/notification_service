@@ -15,7 +15,7 @@ import (
 type (
 	NotificationRepo interface {
 		GetNotificationsByRecipientID(request *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
-		SaveNotification(ctx context.Context, notification *entity.Notification) error
+		UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error
 		GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error)
 		InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error
 	}

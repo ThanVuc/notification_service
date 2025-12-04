@@ -7,7 +7,7 @@ import (
 
 type (
 	NotificationMapper interface {
-		FromProtoToEntity(protoNotification *common.Notification) *entity.Notification
+		FromProtoListToEntities(notif []*common.Notification, isPublished bool) []*entity.Notification
 	}
 )
 
