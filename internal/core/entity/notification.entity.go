@@ -26,7 +26,8 @@ type Notification struct {
 	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt       time.Time     `bson:"updated_at" json:"updated_at"`
 	CorrelationId   string        `bson:"correlation_id,omitempty" json:"correlation_id,omitempty"`
-	CorrelationType int32         `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
+	CorrelationType string        `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
+	IsPublished     bool          `bson:"is_published" json:"is_published"`
 }
 
 func (n *Notification) CollectionName() string {
@@ -77,6 +78,10 @@ func CreateNotificationCollection(
 				"updated_at": bson.M{
 					"bsonType":    "date",
 					"description": "Last update timestamp",
+				},
+				"is_published": bson.M{
+					"bsonType":    "bool",
+					"description": "Published status",
 				},
 			},
 		},
