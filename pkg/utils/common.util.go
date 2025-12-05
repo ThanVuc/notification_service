@@ -86,13 +86,13 @@ func FromTimeStampToTimePtr(timestamp *int64) *time.Time {
 		return nil
 	}
 	// 13 digits timestamp
-	t := time.UnixMilli(*timestamp)
+	t := time.UnixMilli(*timestamp).UTC()
 	return &t
 }
 
 func FromTimeStampToTime(timestamp int64) time.Time {
 	// 13 digits timestamp
-	return time.UnixMilli(timestamp)
+	return time.UnixMilli(timestamp).UTC()
 }
 
 func FromTimeToTimeStamp(t time.Time) int64 {
