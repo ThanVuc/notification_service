@@ -37,6 +37,8 @@ func (n *notificationMapper) FromProtoListToEntities(notif []*common.Notificatio
 			CorrelationId:   notif.CorrelationId,
 			CorrelationType: notif.CorrelationType,
 			IsPublished:     isPublished,
+			IsEmailSent:     notif.IsEmailSent,
+			IsActive:        notif.IsActive,
 		})
 	}
 	return notifications
