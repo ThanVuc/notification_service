@@ -12,6 +12,7 @@ import (
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
@@ -28,12 +29,48 @@ func (r *notificationRepo) GetNotificationsByRecipientID(request *common.IDReque
 func (r *notificationRepo) UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error {
 	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
 
-	_, err := collection.UpdateMany(
-		ctx,
-		notifications,
-		options.UpdateMany().SetUpsert(true),
-	)
+	models := make([]mongo.WriteModel, 0, len(notifications))
 
+	for _, n := range notifications {
+		if !n.ID.IsZero() {
+			n.ID = bson.NewObjectID()
+		}
+
+		filter := bson.M{"_id": n.ID}
+
+		update := bson.M{
+			"$set": bson.M{
+				"title":            n.Title,
+				"message":          n.Message,
+				"link":             n.Link,
+				"sender_id":        n.SenderId,
+				"receiver_ids":     n.ReceiverIds,
+				"is_read":          n.IsRead,
+				"trigger_at":       n.TriggerAt,
+				"img_url":          n.ImgUrl,
+				"is_email_sent":    n.IsEmailSent,
+				"is_active":        n.IsActive,
+				"created_at":       n.CreatedAt,
+				"updated_at":       n.UpdatedAt,
+				"correlation_id":   n.CorrelationId,
+				"correlation_type": n.CorrelationType,
+				"is_published":     n.IsPublished,
+			},
+		}
+
+		model := mongo.NewUpdateOneModel().
+			SetFilter(filter).
+			SetUpdate(update).
+			SetUpsert(true)
+
+		models = append(models, model)
+	}
+
+	if len(models) == 0 {
+		return nil
+	}
+
+	_, err := collection.BulkWrite(ctx, models, options.BulkWrite().SetOrdered(false))
 	return err
 }
 
