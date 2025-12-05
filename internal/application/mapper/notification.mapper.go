@@ -21,7 +21,7 @@ func (n *notificationMapper) FromProtoListToEntities(notif []*common.Notificatio
 		}
 
 		nowTimestampt := time.Now().UnixMilli()
-		println(notif.GetTitle()+": ", notif.TriggerAt)
+		println(notif.GetTitle()+": ", *notif.TriggerAt)
 		notifications = append(notifications, &entity.Notification{
 			ID:              objectId,
 			Title:           notif.Title,
