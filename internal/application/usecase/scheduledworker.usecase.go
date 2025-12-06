@@ -109,10 +109,12 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 						},
 					}
 
-					_, err := firebaseClient.Send(ctx, message)
+					resp, err := firebaseClient.Send(ctx, message)
 					if err != nil {
 						s.logger.Error("Error sending scheduled notification", "", zap.Error(err))
 					}
+					s.logger.Info("Successfully sent scheduled notification", "", zap.String("response", resp))
+					s.logger.Info("Notification: ", "", zap.String("Token", message.Token), zap.String("Title", message.Data["title"]))
 				}
 			}
 
