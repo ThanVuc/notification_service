@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	dbFetchInterval           = 30 * time.Second
-	notificationCheckInterval = 10 * time.Second
+	dbFetchInterval           = 5 * time.Second
+	notificationCheckInterval = 1 * time.Minute
 )
 
 type scheduledWorkerUsecase struct {
