@@ -10,13 +10,12 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/thanvuc/go-core-lib/log"
-	"github.com/thanvuc/go-core-lib/utils"
 	"go.uber.org/zap"
 )
 
 const (
-	dbFetchInterval           = 5 * time.Minute
-	notificationCheckInterval = 1 * time.Minute
+	dbFetchInterval           = 30 * time.Second
+	notificationCheckInterval = 10 * time.Second
 )
 
 type scheduledWorkerUsecase struct {
@@ -99,16 +98,27 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 			for key, notifications := range tokenAndNotificationsMap {
 				for _, notification := range notifications {
 					s.logger.Info("Notification to send", "", zap.String("trigger_at", notification.TriggerAt.String()))
+					imgUrl := ""
+					if notification.ImgUrl != nil {
+						imgUrl = *notification.ImgUrl
+					}
+					link := ""
+					if notification.Link != nil {
+						link = *notification.Link
+					}
+					triggerAt := ""
+					if notification.TriggerAt != nil {
+						triggerAt = strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10)
+					}
+
 					message := &messaging.Message{
 						Token: key,
 						Data: map[string]string{
-							"title": notification.Title,
-							"body":  notification.Message,
-							"url":   utils.Ternary(notification.Link != nil, *notification.Link, ""),
-							"src":   utils.Ternary(notification.ImgUrl != nil, *notification.ImgUrl, ""),
-							"trigger_at": utils.Ternary(notification.TriggerAt != nil,
-								strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10),
-								""),
+							"title":      notification.Title,
+							"body":       notification.Message,
+							"url":        link,
+							"src":        imgUrl,
+							"trigger_at": triggerAt,
 						},
 					}
 
