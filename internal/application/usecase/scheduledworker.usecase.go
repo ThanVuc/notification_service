@@ -98,14 +98,17 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 
 			for key, notifications := range tokenAndNotificationsMap {
 				for _, notification := range notifications {
+					s.logger.Info("Notification to send", "", zap.String("trigger_at", notification.TriggerAt.String()))
 					message := &messaging.Message{
 						Token: key,
 						Data: map[string]string{
-							"title":      notification.Title,
-							"body":       notification.Message,
-							"url":        utils.Ternary(notification.Link != nil, *notification.Link, ""),
-							"src":        utils.Ternary(notification.ImgUrl != nil, *notification.ImgUrl, ""),
-							"trigger_at": strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10),
+							"title": notification.Title,
+							"body":  notification.Message,
+							"url":   utils.Ternary(notification.Link != nil, *notification.Link, ""),
+							"src":   utils.Ternary(notification.ImgUrl != nil, *notification.ImgUrl, ""),
+							"trigger_at": utils.Ternary(notification.TriggerAt != nil,
+								strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10),
+								""),
 						},
 					}
 
