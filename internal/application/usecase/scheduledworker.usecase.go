@@ -10,6 +10,7 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/thanvuc/go-core-lib/log"
+	"github.com/thanvuc/go-core-lib/utils"
 	"go.uber.org/zap"
 )
 
@@ -102,8 +103,8 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 						Data: map[string]string{
 							"title":      notification.Title,
 							"body":       notification.Message,
-							"url":        *notification.Link,
-							"src":        *notification.ImgUrl,
+							"url":        utils.Ternary(notification.Link != nil, *notification.Link, ""),
+							"src":        utils.Ternary(notification.ImgUrl != nil, *notification.ImgUrl, ""),
 							"trigger_at": strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10),
 						},
 					}
