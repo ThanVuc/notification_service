@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	dbFetchInterval           = 5 * time.Second
+	dbFetchInterval           = 5 * time.Minute
 	notificationCheckInterval = 1 * time.Minute
 )
 
