@@ -12,14 +12,22 @@ import (
 )
 
 type Notification struct {
-	ID          string    `bson:"_id,omitempty" json:"id"`
-	Message     string    `bson:"message" json:"message"`
-	Link        string    `bson:"link" json:"link"`
-	SenderId    string    `bson:"sender_id" json:"sender_id"`
-	ReceiverIds []string  `bson:"receiver_ids" json:"receiver_ids"`
-	IsRead      bool      `bson:"is_read" json:"is_read"`
-	CreatedAt   time.Time `bson:"created_at" json:"created_at"`
-	UpdatedAt   time.Time `bson:"updated_at" json:"updated_at"`
+	ID              bson.ObjectID `bson:"_id,omitempty" json:"id"`
+	Title           string        `bson:"title" json:"title"`
+	Message         string        `bson:"message" json:"message"`
+	Link            *string       `bson:"link" json:"link"`
+	SenderId        string        `bson:"sender_id" json:"sender_id"`
+	ReceiverIds     []string      `bson:"receiver_ids" json:"receiver_ids"`
+	IsRead          bool          `bson:"is_read" json:"is_read"`
+	TriggerAt       *time.Time    `bson:"trigger_at" json:"trigger_at"`
+	ImgUrl          *string       `bson:"img_url" json:"img_url"`
+	IsEmailSent     bool          `bson:"is_email_sent" json:"is_email_sent"`
+	IsActive        bool          `bson:"is_active" json:"is_active"`
+	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
+	UpdatedAt       time.Time     `bson:"updated_at" json:"updated_at"`
+	CorrelationId   string        `bson:"correlation_id,omitempty" json:"correlation_id,omitempty"`
+	CorrelationType string        `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
+	IsPublished     bool          `bson:"is_published" json:"is_published"`
 }
 
 func (n *Notification) CollectionName() string {
@@ -37,7 +45,7 @@ func CreateNotificationCollection(
 			"required": []string{"_id", "message", "sender_id", "receiver_ids", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
-					"bsonType":    "string",
+					"bsonType":    []string{"objectId"},
 					"description": "ID",
 				},
 				"message": bson.M{
@@ -70,6 +78,10 @@ func CreateNotificationCollection(
 				"updated_at": bson.M{
 					"bsonType":    "date",
 					"description": "Last update timestamp",
+				},
+				"is_published": bson.M{
+					"bsonType":    "bool",
+					"description": "Published status",
 				},
 			},
 		},
