@@ -27,6 +27,7 @@ type UpsertUserFCMTokenRequest struct {
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id"`
 	FcmToken      string                 `protobuf:"bytes,2,opt,name=fcm_token,json=fcmToken,proto3" json:"fcm_token"`
 	DeviceId      string                 `protobuf:"bytes,3,opt,name=device_id,json=deviceId,proto3" json:"device_id"`
+	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,15 +83,23 @@ func (x *UpsertUserFCMTokenRequest) GetDeviceId() string {
 	return ""
 }
 
+func (x *UpsertUserFCMTokenRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
 var File_notification_service_user_notification_proto protoreflect.FileDescriptor
 
 const file_notification_service_user_notification_proto_rawDesc = "" +
 	"\n" +
-	",notification_service/user.notification.proto\x12\fnotification\x1a\x13common/common.proto\"n\n" +
+	",notification_service/user.notification.proto\x12\fnotification\x1a\x13common/common.proto\"\x84\x01\n" +
 	"\x19UpsertUserFCMTokenRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tfcm_token\x18\x02 \x01(\tR\bfcmToken\x12\x1b\n" +
-	"\tdevice_id\x18\x03 \x01(\tR\bdeviceId2o\n" +
+	"\tdevice_id\x18\x03 \x01(\tR\bdeviceId\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email2o\n" +
 	"\x17UserNotificationService\x12T\n" +
 	"\x12UpsertUserFCMToken\x12'.notification.UpsertUserFCMTokenRequest\x1a\x15.common.EmptyResponseB\x1cZ\x1aproto/notification_serviceb\x06proto3"
 

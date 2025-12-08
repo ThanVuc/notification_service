@@ -14,6 +14,7 @@ import (
 type User struct {
 	ID        bson.ObjectID `bson:"_id,omitempty" json:"id"`
 	UserID    string        `bson:"user_id" json:"user_id"`
+	Email     string        `bson:"email" json:"email"`
 	FCMToken  string        `bson:"fcm_token" json:"fcm_token"`
 	DeviceID  string        `bson:"device_id" json:"device_id"`
 	CreatedAt time.Time     `bson:"created_at" json:"created_at"`
@@ -32,7 +33,7 @@ func CreateUserCollection(
 	userValidator := bson.M{
 		"$jsonSchema": bson.M{
 			"bsonType": "object",
-			"required": []string{"_id", "user_id", "fcm_token", "device_id", "created_at", "updated_at"},
+			"required": []string{"_id", "user_id", "email", "fcm_token", "device_id", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
 					"bsonType":    []string{"objectId"},
@@ -57,6 +58,10 @@ func CreateUserCollection(
 				"updated_at": bson.M{
 					"bsonType":    "date",
 					"description": "Last update timestamp",
+				},
+				"email": bson.M{
+					"bsonType":    "string",
+					"description": "User email",
 				},
 			},
 		},
