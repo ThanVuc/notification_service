@@ -34,7 +34,7 @@ type Notification struct {
 	UpdateAt        int64                  `protobuf:"varint,9,opt,name=update_at,json=updateAt,proto3" json:"update_at"`
 	TriggerAt       *int64                 `protobuf:"varint,10,opt,name=trigger_at,json=triggerAt,proto3,oneof" json:"trigger_at"`
 	ImageUrl        *string                `protobuf:"bytes,11,opt,name=image_url,json=imageUrl,proto3,oneof" json:"image_url"`
-	IsEmailSent     bool                   `protobuf:"varint,12,opt,name=is_email_sent,json=isEmailSent,proto3" json:"is_email_sent"`
+	IsSendMail      bool                   `protobuf:"varint,12,opt,name=is_send_mail,json=isSendMail,proto3" json:"is_send_mail"`
 	IsActive        bool                   `protobuf:"varint,13,opt,name=is_active,json=isActive,proto3" json:"is_active"`
 	CorrelationId   string                 `protobuf:"bytes,14,opt,name=correlation_id,json=correlationId,proto3" json:"correlation_id"`
 	CorrelationType int32                  `protobuf:"varint,15,opt,name=correlation_type,json=correlationType,proto3" json:"correlation_type"`
@@ -149,9 +149,9 @@ func (x *Notification) GetImageUrl() string {
 	return ""
 }
 
-func (x *Notification) GetIsEmailSent() bool {
+func (x *Notification) GetIsSendMail() bool {
 	if x != nil {
-		return x.IsEmailSent
+		return x.IsSendMail
 	}
 	return false
 }
@@ -181,7 +181,7 @@ var File_notification_service_common_notification_proto protoreflect.FileDescrip
 
 const file_notification_service_common_notification_proto_rawDesc = "" +
 	"\n" +
-	".notification_service/common.notification.proto\x12\fnotification\"\xfb\x03\n" +
+	".notification_service/common.notification.proto\x12\fnotification\"\xf9\x03\n" +
 	"\fNotification\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
@@ -196,8 +196,9 @@ const file_notification_service_common_notification_proto_rawDesc = "" +
 	"\n" +
 	"trigger_at\x18\n" +
 	" \x01(\x03H\x01R\ttriggerAt\x88\x01\x01\x12 \n" +
-	"\timage_url\x18\v \x01(\tH\x02R\bimageUrl\x88\x01\x01\x12\"\n" +
-	"\ris_email_sent\x18\f \x01(\bR\visEmailSent\x12\x1b\n" +
+	"\timage_url\x18\v \x01(\tH\x02R\bimageUrl\x88\x01\x01\x12 \n" +
+	"\fis_send_mail\x18\f \x01(\bR\n" +
+	"isSendMail\x12\x1b\n" +
 	"\tis_active\x18\r \x01(\bR\bisActive\x12%\n" +
 	"\x0ecorrelation_id\x18\x0e \x01(\tR\rcorrelationId\x12)\n" +
 	"\x10correlation_type\x18\x0f \x01(\x05R\x0fcorrelationTypeB\a\n" +

@@ -8,6 +8,7 @@ import (
 	"github.com/thanvuc/go-core-lib/eventbus"
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
+	"gopkg.in/gomail.v2"
 )
 
 type BaseModule struct {
@@ -16,6 +17,7 @@ type BaseModule struct {
 	CacheConnector    *cache.RedisCache
 	MongoConnector    *mongolib.MongoConnector
 	FirebaseApp       *firebase.App
+	EmailDialer       *gomail.Dialer
 }
 
 func NewBaseModule(
@@ -26,6 +28,7 @@ func NewBaseModule(
 	cacheConnector := NewRedis(configuration, logger)
 	mongodbConnector := NewMongoDB(configuration, logger)
 	firebaseApp := NewFirebaseApp(configuration, logger)
+	emailDialer := NewEmailDialer(configuration, logger)
 
 	return &BaseModule{
 		Logger:            logger,
@@ -33,5 +36,6 @@ func NewBaseModule(
 		CacheConnector:    cacheConnector,
 		MongoConnector:    mongodbConnector,
 		FirebaseApp:       firebaseApp,
+		EmailDialer:       emailDialer,
 	}
 }

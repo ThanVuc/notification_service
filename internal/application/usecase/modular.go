@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"notification_service/internal/application/helper"
 	"notification_service/internal/application/mapper"
 	"notification_service/internal/infrastructure"
 )
@@ -15,6 +16,7 @@ func NewUsecaseModule(
 	infrastructureModule *infrastructure.InfrastructureModule,
 ) *UsecaseModule {
 	mapperModule := mapper.NewMapperModule()
+	helperModule := helper.NewMapperModule(infrastructureModule)
 
 	notificationUseCase := NewNotificationUseCase(
 		infrastructureModule.BaseModule.MongoConnector,
@@ -35,6 +37,7 @@ func NewUsecaseModule(
 		infrastructureModule.RepoModule.NotificationRepo,
 		infrastructureModule.BaseModule.FirebaseApp,
 		infrastructureModule.RepoModule.UserNotificationRepo,
+		*helperModule.EmailHelper,
 	)
 
 	return &UsecaseModule{

@@ -48,7 +48,7 @@ func (r *notificationRepo) UpsertNotifications(ctx context.Context, notification
 				"is_read":          n.IsRead,
 				"trigger_at":       n.TriggerAt,
 				"img_url":          n.ImgUrl,
-				"is_email_sent":    n.IsEmailSent,
+				"is_email_sent":    n.IsSendMail,
 				"is_active":        n.IsActive,
 				"created_at":       n.CreatedAt,
 				"updated_at":       n.UpdatedAt,
@@ -116,5 +116,15 @@ func (r *notificationRepo) InvalidateNotifications(ctx context.Context, notifica
 		bson.M{"$set": bson.M{"is_active": false}},
 	)
 
+	return err
+}
+
+func (r *notificationRepo) MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	_, err := collection.UpdateMany(
+		ctx,
+		bson.M{"_id": bson.M{"$in": notificationID}},
+		bson.M{"$set": bson.M{"is_published": true}},
+	)
 	return err
 }

@@ -21,7 +21,7 @@ type Notification struct {
 	IsRead          bool          `bson:"is_read" json:"is_read"`
 	TriggerAt       *time.Time    `bson:"trigger_at" json:"trigger_at"`
 	ImgUrl          *string       `bson:"img_url" json:"img_url"`
-	IsEmailSent     bool          `bson:"is_email_sent" json:"is_email_sent"`
+	IsSendMail      bool          `bson:"is_email_sent" json:"is_email_sent"`
 	IsActive        bool          `bson:"is_active" json:"is_active"`
 	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt       time.Time     `bson:"updated_at" json:"updated_at"`
