@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"notification_service/internal/application/helper"
+	app_model "notification_service/internal/application/model"
 	"notification_service/internal/core/entity"
 	"notification_service/internal/infrastructure/repos"
 	"strconv"
@@ -23,6 +25,7 @@ type scheduledWorkerUsecase struct {
 	notificationRepo repos.NotificationRepo
 	userRepo         repos.UserNotificationRepo
 	firebaseApp      *firebase.App
+	emailHelper      helper.EmailHelper
 }
 
 func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Context) error {
@@ -64,7 +67,6 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 			if !exists {
 				continue
 			}
-			tokenAndNotificationsMap := make(map[string][]*entity.Notification)
 			receiverIDs := make([]string, 0)
 			for _, notification := range notificationsToSend {
 				receiverIDs = append(receiverIDs, notification.ReceiverIds...)
@@ -76,58 +78,53 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 				continue
 			}
 
+			userMap := make(map[string]*entity.User)
+			for _, user := range users {
+				userMap[user.UserID] = user
+			}
+
 			if len(users) == 0 {
 				s.logger.Info("No users found for scheduled notifications", "")
 				continue
 			}
 
-			// Map notifications to user tokens
-			// One notification only has one receiver in this case
 			for _, notification := range notificationsToSend {
-				for _, user := range users {
-					if user.FCMToken == "" || len(notification.ReceiverIds) == 0 {
-						continue
-					}
-
-					if user.UserID == notification.ReceiverIds[0] {
-						tokenAndNotificationsMap[user.FCMToken] = append(tokenAndNotificationsMap[user.FCMToken], notification)
-					}
+				if len(notification.ReceiverIds) == 0 {
+					continue
 				}
-			}
 
-			for key, notifications := range tokenAndNotificationsMap {
-				for _, notification := range notifications {
-					s.logger.Info("Notification to send", "", zap.String("trigger_at", notification.TriggerAt.String()))
-					imgUrl := ""
-					if notification.ImgUrl != nil {
-						imgUrl = *notification.ImgUrl
-					}
-					link := ""
-					if notification.Link != nil {
-						link = *notification.Link
-					}
-					triggerAt := ""
-					if notification.TriggerAt != nil {
-						triggerAt = strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10)
-					}
+				imgUrl := ""
+				if notification.ImgUrl != nil {
+					imgUrl = *notification.ImgUrl
+				}
+				link := ""
+				if notification.Link != nil {
+					link = *notification.Link
+				}
+				triggerAt := ""
+				if notification.TriggerAt != nil {
+					triggerAt = strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10)
+				}
 
-					message := &messaging.Message{
-						Token: key,
-						Data: map[string]string{
-							"title":      notification.Title,
-							"body":       notification.Message,
-							"url":        link,
-							"src":        imgUrl,
-							"trigger_at": triggerAt,
-						},
-					}
+				if notification.IsSendMail {
+					s.SendMailReminder(ctx, notification, userMap[notification.ReceiverIds[0]])
+					continue
+				}
 
-					resp, err := firebaseClient.Send(ctx, message)
-					if err != nil {
-						s.logger.Error("Error sending scheduled notification", "", zap.Error(err))
-					}
-					s.logger.Info("Successfully sent scheduled notification", "", zap.String("response", resp))
-					s.logger.Info("Notification: ", "", zap.String("Token", message.Token), zap.String("Title", message.Data["title"]))
+				message := &messaging.Message{
+					Token: userMap[notification.ReceiverIds[0]].FCMToken,
+					Data: map[string]string{
+						"title":      notification.Title,
+						"body":       notification.Message,
+						"url":        link,
+						"src":        imgUrl,
+						"trigger_at": triggerAt,
+					},
+				}
+
+				_, err := firebaseClient.Send(ctx, message)
+				if err != nil {
+					s.logger.Error("Error sending scheduled notification", "", zap.Error(err))
 				}
 			}
 
@@ -157,5 +154,16 @@ func (s *scheduledWorkerUsecase) fetchScheduledNotifications(
 		notificationMap[timeStr] = append(notificationMap[timeStr], notification)
 	}
 
+	return nil
+}
+
+func (s *scheduledWorkerUsecase) SendMailReminder(ctx context.Context, notification *entity.Notification, user *entity.User) error {
+	mailData := app_model.EmailData{
+		Title:      notification.Title,
+		Message:    notification.Message,
+		Link:       *notification.Link,
+		ButtonText: "Xem công việc",
+	}
+	s.emailHelper.SendScheduledWorkEmail(user.Email, mailData)
 	return nil
 }

@@ -18,6 +18,7 @@ type (
 		UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error
 		GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error)
 		InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error
+		MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error
 	}
 
 	UserNotificationRepo interface {

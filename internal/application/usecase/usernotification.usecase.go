@@ -24,6 +24,7 @@ func (n *userNotificationUseCase) UpsertUserFCMToken(ctx context.Context, req *n
 		UserID:    req.GetUserId(),
 		DeviceID:  req.GetDeviceId(),
 		FCMToken:  req.GetFcmToken(),
+		Email:     req.GetEmail(),
 		UpdatedAt: time.Now().UTC(),
 	}
 

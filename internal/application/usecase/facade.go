@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"notification_service/internal/application/helper"
 	"notification_service/internal/application/mapper"
 	"notification_service/internal/infrastructure/repos"
 	"notification_service/proto/common"
@@ -61,11 +62,13 @@ func NewScheduledWorkerUseCase(
 	notificationRepo repos.NotificationRepo,
 	firebaseApp *firebase.App,
 	userRepo repos.UserNotificationRepo,
+	emailHelper helper.EmailHelper,
 ) ScheduledWorkerUseCase {
 	return &scheduledWorkerUsecase{
 		logger:           logger,
 		notificationRepo: notificationRepo,
 		firebaseApp:      firebaseApp,
 		userRepo:         userRepo,
+		emailHelper:      emailHelper,
 	}
 }

@@ -26,6 +26,7 @@ func (r *userNotificationRepo) UpsertUserNotification(ctx context.Context, user 
 		"$set": bson.M{
 			"fcm_token":  user.FCMToken,
 			"updated_at": user.UpdatedAt,
+			"email":      user.Email,
 		},
 		"$setOnInsert": bson.M{
 			"created_at": user.CreatedAt,
