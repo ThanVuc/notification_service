@@ -11,6 +11,7 @@ func NewMapperModule(
 ) *HelperModule {
 	emailHelper := NewEmailHelper(
 		infrastructureModule.BaseModule.EmailDialer,
+		infrastructureModule.BaseModule.Logger,
 	)
 	return &HelperModule{
 		EmailHelper: emailHelper,
