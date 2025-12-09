@@ -23,7 +23,7 @@ const EmailHTML = `
 <td align="center" style="padding:28px;">
 
   <div style="color:#e0c3fc; font-size:20px; font-weight:700; font-family:Arial, sans-serif;">
-    Mystical Summons
+    Schedulr
   </div>
 
   <div style="color:#ffd700; font-size:24px; font-weight:700; margin-top:8px; font-family:Arial, sans-serif;">
