@@ -2,23 +2,28 @@ package helper
 
 import (
 	"bytes"
+	"fmt"
 	app_constant "notification_service/internal/application/constant"
 	app_model "notification_service/internal/application/model"
 	app_template "notification_service/internal/application/template"
 	"text/template"
 
+	"github.com/thanvuc/go-core-lib/log"
 	"gopkg.in/gomail.v2"
 )
 
 type EmailHelper struct {
 	emailDialer *gomail.Dialer
+	logger      log.Logger
 }
 
 func NewEmailHelper(
 	emailDialer *gomail.Dialer,
+	logger log.Logger,
 ) *EmailHelper {
 	return &EmailHelper{
 		emailDialer: emailDialer,
+		logger:      logger,
 	}
 }
 
@@ -27,6 +32,9 @@ func (h *EmailHelper) SendScheduledWorkEmail(to string, data app_model.EmailData
 	if err != nil {
 		return err
 	}
+
+	emailContent := fmt.Sprintf("Title: %s, message: %s, Link: %s")
+	h.logger.Info("Sending email to: "+to+", With content: "+emailContent, "")
 
 	m := gomail.NewMessage()
 
