@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func Contains[T comparable](slice []T, item T) bool {
@@ -106,4 +107,9 @@ func FromTimePtrToTimeStamp(t *time.Time) *int64 {
 
 	timestamp := t.UnixMilli()
 	return &timestamp
+}
+
+func FromObjectIdToStringPointer(hex bson.ObjectID) *string {
+	hexStr := hex.Hex()
+	return &hexStr
 }

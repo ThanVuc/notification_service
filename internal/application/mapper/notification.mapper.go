@@ -4,6 +4,7 @@ import (
 	"notification_service/internal/core/entity"
 	"notification_service/pkg/utils"
 	"notification_service/proto/common"
+	"notification_service/proto/notification_service"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -41,4 +42,30 @@ func (n *notificationMapper) FromProtoListToEntities(notif []*common.Notificatio
 		})
 	}
 	return notifications
+}
+
+func (n *notificationMapper) FromEntitiesToProtoList(notifications []*entity.Notification) []*notification_service.Notification {
+	protoNotifications := make([]*notification_service.Notification, 0, len(notifications))
+	for _, notification := range notifications {
+		protoNotifications = append(protoNotifications, n.FromEntityToProto(notification))
+	}
+	return protoNotifications
+}
+
+func (n *notificationMapper) FromEntityToProto(notification *entity.Notification) *notification_service.Notification {
+	return &notification_service.Notification{
+		Id:              notification.ID.Hex(),
+		Title:           notification.Title,
+		Message:         notification.Message,
+		SenderId:        notification.SenderId,
+		ReceiverIds:     notification.ReceiverIds,
+		IsRead:          notification.IsRead,
+		IsActive:        notification.IsActive,
+		IsSendMail:      notification.IsSendMail,
+		Link:            notification.Link,
+		TriggerAt:       utils.FromTimePtrToTimeStamp(notification.TriggerAt),
+		ImageUrl:        notification.ImgUrl,
+		CorrelationId:   notification.CorrelationId,
+		CorrelationType: notification.CorrelationType,
+	}
 }

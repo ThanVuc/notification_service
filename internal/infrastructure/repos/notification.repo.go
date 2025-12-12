@@ -6,7 +6,6 @@ import (
 	"notification_service/internal/core/constant"
 	"notification_service/internal/core/entity"
 	"notification_service/proto/common"
-	"notification_service/proto/notification_service"
 	"time"
 
 	"github.com/thanvuc/go-core-lib/log"
@@ -21,9 +20,29 @@ type notificationRepo struct {
 	logger         log.Logger
 }
 
-func (r *notificationRepo) GetNotificationsByRecipientID(request *common.IDRequest) (*notification_service.GetNotificationsResponse, error) {
-	// Implementation goes here
-	return nil, nil
+func (r *notificationRepo) GetNotificationsByRecipientID(ctx context.Context, request *common.IDRequest) ([]*entity.Notification, error) {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	filter := bson.M{
+		"receiver_ids": bson.M{"$in": []string{request.Id}},
+		"is_published": true,
+	}
+	opts := options.Find().SetSort(bson.D{
+		{Key: "is_read", Value: 1},
+		{Key: "trigger_at", Value: -1},
+	}).
+		SetLimit(100)
+
+	cursor, err := collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var notifications []*entity.Notification
+	if err := cursor.All(ctx, &notifications); err != nil {
+		return nil, err
+	}
+
+	return notifications, nil
 }
 
 func (r *notificationRepo) UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error {
@@ -125,6 +144,25 @@ func (r *notificationRepo) MarkIsPublished(ctx context.Context, notificationID [
 		ctx,
 		bson.M{"_id": bson.M{"$in": notificationID}},
 		bson.M{"$set": bson.M{"is_published": true}},
+	)
+	return err
+}
+
+func (r *notificationRepo) MarkNotificationsAsRead(ctx context.Context, notificationID []bson.ObjectID) error {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	_, err := collection.UpdateMany(
+		ctx,
+		bson.M{"_id": bson.M{"$in": notificationID}},
+		bson.M{"$set": bson.M{"is_read": true}},
+	)
+	return err
+}
+
+func (r *notificationRepo) DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	_, err := collection.DeleteOne(
+		ctx,
+		bson.M{"_id": notificationID},
 	)
 	return err
 }
