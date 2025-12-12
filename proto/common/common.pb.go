@@ -161,6 +161,50 @@ func (x *IDRequest) GetId() string {
 	return ""
 }
 
+type IDsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IDsRequest) Reset() {
+	*x = IDsRequest{}
+	mi := &file_common_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IDsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IDsRequest) ProtoMessage() {}
+
+func (x *IDsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IDsRequest.ProtoReflect.Descriptor instead.
+func (*IDsRequest) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *IDsRequest) GetIds() []string {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
 type IDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id"`
@@ -171,7 +215,7 @@ type IDResponse struct {
 
 func (x *IDResponse) Reset() {
 	*x = IDResponse{}
-	mi := &file_common_common_proto_msgTypes[3]
+	mi := &file_common_common_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +227,7 @@ func (x *IDResponse) String() string {
 func (*IDResponse) ProtoMessage() {}
 
 func (x *IDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[3]
+	mi := &file_common_common_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +240,7 @@ func (x *IDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IDResponse.ProtoReflect.Descriptor instead.
 func (*IDResponse) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{3}
+	return file_common_common_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *IDResponse) GetId() string {
@@ -234,7 +278,7 @@ type Notification struct {
 
 func (x *Notification) Reset() {
 	*x = Notification{}
-	mi := &file_common_common_proto_msgTypes[4]
+	mi := &file_common_common_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -246,7 +290,7 @@ func (x *Notification) String() string {
 func (*Notification) ProtoMessage() {}
 
 func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[4]
+	mi := &file_common_common_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -259,7 +303,7 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notification.ProtoReflect.Descriptor instead.
 func (*Notification) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{4}
+	return file_common_common_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Notification) GetId() string {
@@ -362,7 +406,7 @@ type Notifications struct {
 
 func (x *Notifications) Reset() {
 	*x = Notifications{}
-	mi := &file_common_common_proto_msgTypes[5]
+	mi := &file_common_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -374,7 +418,7 @@ func (x *Notifications) String() string {
 func (*Notifications) ProtoMessage() {}
 
 func (x *Notifications) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[5]
+	mi := &file_common_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +431,7 @@ func (x *Notifications) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notifications.ProtoReflect.Descriptor instead.
 func (*Notifications) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{5}
+	return file_common_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Notifications) GetNotifications() []*Notification {
@@ -413,7 +457,10 @@ const file_common_common_proto_rawDesc = "" +
 	"\x06_error\"\x0e\n" +
 	"\fEmptyRequest\"\x1b\n" +
 	"\tIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"P\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x1e\n" +
+	"\n" +
+	"IDsRequest\x12\x10\n" +
+	"\x03ids\x18\x01 \x03(\tR\x03ids\"P\n" +
 	"\n" +
 	"IDResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
@@ -456,20 +503,21 @@ func file_common_common_proto_rawDescGZIP() []byte {
 	return file_common_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_common_common_proto_goTypes = []any{
 	(*EmptyResponse)(nil), // 0: common.EmptyResponse
 	(*EmptyRequest)(nil),  // 1: common.EmptyRequest
 	(*IDRequest)(nil),     // 2: common.IDRequest
-	(*IDResponse)(nil),    // 3: common.IDResponse
-	(*Notification)(nil),  // 4: common.Notification
-	(*Notifications)(nil), // 5: common.Notifications
-	(*Error)(nil),         // 6: common.Error
+	(*IDsRequest)(nil),    // 3: common.IDsRequest
+	(*IDResponse)(nil),    // 4: common.IDResponse
+	(*Notification)(nil),  // 5: common.Notification
+	(*Notifications)(nil), // 6: common.Notifications
+	(*Error)(nil),         // 7: common.Error
 }
 var file_common_common_proto_depIdxs = []int32{
-	6, // 0: common.EmptyResponse.error:type_name -> common.Error
-	6, // 1: common.IDResponse.error:type_name -> common.Error
-	4, // 2: common.Notifications.notifications:type_name -> common.Notification
+	7, // 0: common.EmptyResponse.error:type_name -> common.Error
+	7, // 1: common.IDResponse.error:type_name -> common.Error
+	5, // 2: common.Notifications.notifications:type_name -> common.Notification
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -484,15 +532,15 @@ func file_common_common_proto_init() {
 	}
 	file_common_error_proto_init()
 	file_common_common_proto_msgTypes[0].OneofWrappers = []any{}
-	file_common_common_proto_msgTypes[3].OneofWrappers = []any{}
 	file_common_common_proto_msgTypes[4].OneofWrappers = []any{}
+	file_common_common_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
