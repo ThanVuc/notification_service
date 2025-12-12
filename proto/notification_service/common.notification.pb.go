@@ -37,7 +37,7 @@ type Notification struct {
 	IsSendMail      bool                   `protobuf:"varint,12,opt,name=is_send_mail,json=isSendMail,proto3" json:"is_send_mail"`
 	IsActive        bool                   `protobuf:"varint,13,opt,name=is_active,json=isActive,proto3" json:"is_active"`
 	CorrelationId   string                 `protobuf:"bytes,14,opt,name=correlation_id,json=correlationId,proto3" json:"correlation_id"`
-	CorrelationType int32                  `protobuf:"varint,15,opt,name=correlation_type,json=correlationType,proto3" json:"correlation_type"`
+	CorrelationType string                 `protobuf:"bytes,15,opt,name=correlation_type,json=correlationType,proto3" json:"correlation_type"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -170,11 +170,11 @@ func (x *Notification) GetCorrelationId() string {
 	return ""
 }
 
-func (x *Notification) GetCorrelationType() int32 {
+func (x *Notification) GetCorrelationType() string {
 	if x != nil {
 		return x.CorrelationType
 	}
-	return 0
+	return ""
 }
 
 var File_notification_service_common_notification_proto protoreflect.FileDescriptor
@@ -201,7 +201,7 @@ const file_notification_service_common_notification_proto_rawDesc = "" +
 	"isSendMail\x12\x1b\n" +
 	"\tis_active\x18\r \x01(\bR\bisActive\x12%\n" +
 	"\x0ecorrelation_id\x18\x0e \x01(\tR\rcorrelationId\x12)\n" +
-	"\x10correlation_type\x18\x0f \x01(\x05R\x0fcorrelationTypeB\a\n" +
+	"\x10correlation_type\x18\x0f \x01(\tR\x0fcorrelationTypeB\a\n" +
 	"\x05_linkB\r\n" +
 	"\v_trigger_atB\f\n" +
 	"\n" +

@@ -16,8 +16,10 @@ import (
 
 type (
 	NotificationUseCase interface {
-		GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
+		GetNotificationsByRecipientId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByRecipientIdResponse, error)
 		ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
+		MarkNotificationsAsRead(ctx context.Context, req *common.IDsRequest) (*common.EmptyResponse, error)
+		DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error)
 	}
 
 	UserNotificationUseCase interface {

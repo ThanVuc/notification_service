@@ -12,6 +12,7 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"github.com/thanvuc/go-core-lib/log"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.uber.org/zap"
 )
 
@@ -87,7 +88,7 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 				s.logger.Info("No users found for scheduled notifications", "")
 				continue
 			}
-
+			publishedIDs := make([]bson.ObjectID, 0)
 			for _, notification := range notificationsToSend {
 				if len(notification.ReceiverIds) == 0 {
 					continue
@@ -125,6 +126,14 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 				_, err := firebaseClient.Send(ctx, message)
 				if err != nil {
 					s.logger.Error("Error sending scheduled notification", "", zap.Error(err))
+					continue
+				}
+				publishedIDs = append(publishedIDs, notification.ID)
+			}
+			// Mark notifications as sent
+			if len(publishedIDs) > 0 {
+				if err := s.notificationRepo.MarkIsPublished(ctx, publishedIDs); err != nil {
+					s.logger.Error("Failed to mark notifications as sent", "", zap.Error(err))
 				}
 			}
 

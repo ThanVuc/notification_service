@@ -4,7 +4,6 @@ import (
 	"context"
 	"notification_service/internal/core/entity"
 	"notification_service/proto/common"
-	"notification_service/proto/notification_service"
 	"time"
 
 	"github.com/thanvuc/go-core-lib/log"
@@ -14,11 +13,13 @@ import (
 
 type (
 	NotificationRepo interface {
-		GetNotificationsByRecipientID(request *common.IDRequest) (*notification_service.GetNotificationsResponse, error)
+		GetNotificationsByRecipientID(ctx context.Context, request *common.IDRequest) ([]*entity.Notification, error)
 		UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error
 		GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error)
 		InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error
 		MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error
+		MarkNotificationsAsRead(ctx context.Context, notificationID []bson.ObjectID) error
+		DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error
 	}
 
 	UserNotificationRepo interface {

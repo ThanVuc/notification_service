@@ -26,6 +26,14 @@ func NewNotificationController(
 	}
 }
 
-func (c *NotificationController) GetNotifications(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsResponse, error) {
-	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.GetNotifications)
+func (c *NotificationController) GetNotificationsByRecipientId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByRecipientIdResponse, error) {
+	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.GetNotificationsByRecipientId)
+}
+
+func (c *NotificationController) MarkNotificationsAsRead(ctx context.Context, req *common.IDsRequest) (*common.EmptyResponse, error) {
+	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.MarkNotificationsAsRead)
+}
+
+func (c *NotificationController) DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error) {
+	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.DeleteNotificationById)
 }
