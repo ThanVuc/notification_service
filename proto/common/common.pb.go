@@ -271,7 +271,7 @@ type Notification struct {
 	IsSendMail      bool                   `protobuf:"varint,10,opt,name=is_send_mail,json=isSendMail,proto3" json:"is_send_mail"`
 	IsActive        bool                   `protobuf:"varint,11,opt,name=is_active,json=isActive,proto3" json:"is_active"`
 	CorrelationId   string                 `protobuf:"bytes,12,opt,name=correlation_id,json=correlationId,proto3" json:"correlation_id"`
-	CorrelationType string                 `protobuf:"bytes,13,opt,name=correlation_type,json=correlationType,proto3" json:"correlation_type"`
+	CorrelationType NOTIFICATION_TYPE      `protobuf:"varint,13,opt,name=correlation_type,json=correlationType,proto3,enum=common.NOTIFICATION_TYPE" json:"correlation_type"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -390,11 +390,11 @@ func (x *Notification) GetCorrelationId() string {
 	return ""
 }
 
-func (x *Notification) GetCorrelationType() string {
+func (x *Notification) GetCorrelationType() NOTIFICATION_TYPE {
 	if x != nil {
 		return x.CorrelationType
 	}
-	return ""
+	return NOTIFICATION_TYPE_UNSPECIFIED_NOTIFICATION
 }
 
 type Notifications struct {
@@ -445,7 +445,7 @@ var File_common_common_proto protoreflect.FileDescriptor
 
 const file_common_common_proto_rawDesc = "" +
 	"\n" +
-	"\x13common/common.proto\x12\x06common\x1a\x12common/error.proto\"\x99\x01\n" +
+	"\x13common/common.proto\x12\x06common\x1a\x12common/error.proto\x1a\x11common/enum.proto\"\x99\x01\n" +
 	"\rEmptyResponse\x12\x1d\n" +
 	"\asuccess\x18\x01 \x01(\bH\x00R\asuccess\x88\x01\x01\x12\x1d\n" +
 	"\amessage\x18\x02 \x01(\tH\x01R\amessage\x88\x01\x01\x12(\n" +
@@ -465,7 +465,7 @@ const file_common_common_proto_rawDesc = "" +
 	"IDResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
 	"\x05error\x18\x02 \x01(\v2\r.common.ErrorH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error\"\xc9\x03\n" +
+	"\x06_error\"\xe4\x03\n" +
 	"\fNotification\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x18\n" +
@@ -481,8 +481,8 @@ const file_common_common_proto_rawDesc = "" +
 	" \x01(\bR\n" +
 	"isSendMail\x12\x1b\n" +
 	"\tis_active\x18\v \x01(\bR\bisActive\x12%\n" +
-	"\x0ecorrelation_id\x18\f \x01(\tR\rcorrelationId\x12)\n" +
-	"\x10correlation_type\x18\r \x01(\tR\x0fcorrelationTypeB\x05\n" +
+	"\x0ecorrelation_id\x18\f \x01(\tR\rcorrelationId\x12D\n" +
+	"\x10correlation_type\x18\r \x01(\x0e2\x19.common.NOTIFICATION_TYPER\x0fcorrelationTypeB\x05\n" +
 	"\x03_idB\a\n" +
 	"\x05_linkB\r\n" +
 	"\v_trigger_atB\f\n" +
@@ -505,24 +505,26 @@ func file_common_common_proto_rawDescGZIP() []byte {
 
 var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_common_common_proto_goTypes = []any{
-	(*EmptyResponse)(nil), // 0: common.EmptyResponse
-	(*EmptyRequest)(nil),  // 1: common.EmptyRequest
-	(*IDRequest)(nil),     // 2: common.IDRequest
-	(*IDsRequest)(nil),    // 3: common.IDsRequest
-	(*IDResponse)(nil),    // 4: common.IDResponse
-	(*Notification)(nil),  // 5: common.Notification
-	(*Notifications)(nil), // 6: common.Notifications
-	(*Error)(nil),         // 7: common.Error
+	(*EmptyResponse)(nil),  // 0: common.EmptyResponse
+	(*EmptyRequest)(nil),   // 1: common.EmptyRequest
+	(*IDRequest)(nil),      // 2: common.IDRequest
+	(*IDsRequest)(nil),     // 3: common.IDsRequest
+	(*IDResponse)(nil),     // 4: common.IDResponse
+	(*Notification)(nil),   // 5: common.Notification
+	(*Notifications)(nil),  // 6: common.Notifications
+	(*Error)(nil),          // 7: common.Error
+	(NOTIFICATION_TYPE)(0), // 8: common.NOTIFICATION_TYPE
 }
 var file_common_common_proto_depIdxs = []int32{
 	7, // 0: common.EmptyResponse.error:type_name -> common.Error
 	7, // 1: common.IDResponse.error:type_name -> common.Error
-	5, // 2: common.Notifications.notifications:type_name -> common.Notification
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	8, // 2: common.Notification.correlation_type:type_name -> common.NOTIFICATION_TYPE
+	5, // 3: common.Notifications.notifications:type_name -> common.Notification
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_common_common_proto_init() }
@@ -531,6 +533,7 @@ func file_common_common_proto_init() {
 		return
 	}
 	file_common_error_proto_init()
+	file_common_enum_proto_init()
 	file_common_common_proto_msgTypes[0].OneofWrappers = []any{}
 	file_common_common_proto_msgTypes[4].OneofWrappers = []any{}
 	file_common_common_proto_msgTypes[5].OneofWrappers = []any{}

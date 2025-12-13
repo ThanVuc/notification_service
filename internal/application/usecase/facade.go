@@ -20,6 +20,7 @@ type (
 		ConsumeScheduledNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 		MarkNotificationsAsRead(ctx context.Context, req *common.IDsRequest) (*common.EmptyResponse, error)
 		DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error)
+		GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error)
 	}
 
 	UserNotificationUseCase interface {

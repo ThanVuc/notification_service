@@ -20,6 +20,7 @@ type (
 		MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error
 		MarkNotificationsAsRead(ctx context.Context, notificationID []bson.ObjectID) error
 		DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error
+		GetNotificationByWorkId(ctx context.Context, workId string) ([]*entity.Notification, error)
 	}
 
 	UserNotificationRepo interface {
