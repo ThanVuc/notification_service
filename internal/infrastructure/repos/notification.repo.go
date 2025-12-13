@@ -166,3 +166,21 @@ func (r *notificationRepo) DeleteNotificationById(ctx context.Context, notificat
 	)
 	return err
 }
+
+func (r *notificationRepo) GetNotificationByWorkId(ctx context.Context, workId string) ([]*entity.Notification, error) {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	filter := bson.M{
+		"correlation_id":   workId,
+		"correlation_type": int32(common.NOTIFICATION_TYPE_SCHEDULED_NOTIFICATION),
+	}
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var notifications []*entity.Notification
+	if err := cursor.All(ctx, &notifications); err != nil {
+		return nil, err
+	}
+	return notifications, nil
+}

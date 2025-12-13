@@ -74,6 +74,58 @@ func (x *GetNotificationsByRecipientIdResponse) GetError() *common.Error {
 	return nil
 }
 
+type GetNotificationsByWorkIdResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Notifications []*WorkNotification    `protobuf:"bytes,1,rep,name=notifications,proto3" json:"notifications"`
+	Error         *common.Error          `protobuf:"bytes,2,opt,name=error,proto3,oneof" json:"error"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNotificationsByWorkIdResponse) Reset() {
+	*x = GetNotificationsByWorkIdResponse{}
+	mi := &file_notification_service_notification_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNotificationsByWorkIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNotificationsByWorkIdResponse) ProtoMessage() {}
+
+func (x *GetNotificationsByWorkIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_service_notification_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNotificationsByWorkIdResponse.ProtoReflect.Descriptor instead.
+func (*GetNotificationsByWorkIdResponse) Descriptor() ([]byte, []int) {
+	return file_notification_service_notification_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetNotificationsByWorkIdResponse) GetNotifications() []*WorkNotification {
+	if x != nil {
+		return x.Notifications
+	}
+	return nil
+}
+
+func (x *GetNotificationsByWorkIdResponse) GetError() *common.Error {
+	if x != nil {
+		return x.Error
+	}
+	return nil
+}
+
 var File_notification_service_notification_proto protoreflect.FileDescriptor
 
 const file_notification_service_notification_proto_rawDesc = "" +
@@ -82,11 +134,16 @@ const file_notification_service_notification_proto_rawDesc = "" +
 	"%GetNotificationsByRecipientIdResponse\x12@\n" +
 	"\rnotifications\x18\x01 \x03(\v2\x1a.notification.NotificationR\rnotifications\x12(\n" +
 	"\x05error\x18\x02 \x01(\v2\r.common.ErrorH\x00R\x05error\x88\x01\x01B\b\n" +
-	"\x06_error2\x88\x02\n" +
+	"\x06_error\"\x9c\x01\n" +
+	" GetNotificationsByWorkIdResponse\x12D\n" +
+	"\rnotifications\x18\x01 \x03(\v2\x1e.notification.WorkNotificationR\rnotifications\x12(\n" +
+	"\x05error\x18\x02 \x01(\v2\r.common.ErrorH\x00R\x05error\x88\x01\x01B\b\n" +
+	"\x06_error2\xe6\x02\n" +
 	"\x13NotificationService\x12g\n" +
 	"\x1dGetNotificationsByRecipientId\x12\x11.common.IDRequest\x1a3.notification.GetNotificationsByRecipientIdResponse\x12D\n" +
 	"\x17MarkNotificationsAsRead\x12\x12.common.IDsRequest\x1a\x15.common.EmptyResponse\x12B\n" +
-	"\x16DeleteNotificationById\x12\x11.common.IDRequest\x1a\x15.common.EmptyResponseB\x1cZ\x1aproto/notification_serviceb\x06proto3"
+	"\x16DeleteNotificationById\x12\x11.common.IDRequest\x1a\x15.common.EmptyResponse\x12\\\n" +
+	"\x17GetNotificationByWorkId\x12\x11.common.IDRequest\x1a..notification.GetNotificationsByWorkIdResponseB\x1cZ\x1aproto/notification_serviceb\x06proto3"
 
 var (
 	file_notification_service_notification_proto_rawDescOnce sync.Once
@@ -100,29 +157,35 @@ func file_notification_service_notification_proto_rawDescGZIP() []byte {
 	return file_notification_service_notification_proto_rawDescData
 }
 
-var file_notification_service_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_notification_service_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_notification_service_notification_proto_goTypes = []any{
 	(*GetNotificationsByRecipientIdResponse)(nil), // 0: notification.GetNotificationsByRecipientIdResponse
-	(*Notification)(nil),                          // 1: notification.Notification
-	(*common.Error)(nil),                          // 2: common.Error
-	(*common.IDRequest)(nil),                      // 3: common.IDRequest
-	(*common.IDsRequest)(nil),                     // 4: common.IDsRequest
-	(*common.EmptyResponse)(nil),                  // 5: common.EmptyResponse
+	(*GetNotificationsByWorkIdResponse)(nil),      // 1: notification.GetNotificationsByWorkIdResponse
+	(*Notification)(nil),                          // 2: notification.Notification
+	(*common.Error)(nil),                          // 3: common.Error
+	(*WorkNotification)(nil),                      // 4: notification.WorkNotification
+	(*common.IDRequest)(nil),                      // 5: common.IDRequest
+	(*common.IDsRequest)(nil),                     // 6: common.IDsRequest
+	(*common.EmptyResponse)(nil),                  // 7: common.EmptyResponse
 }
 var file_notification_service_notification_proto_depIdxs = []int32{
-	1, // 0: notification.GetNotificationsByRecipientIdResponse.notifications:type_name -> notification.Notification
-	2, // 1: notification.GetNotificationsByRecipientIdResponse.error:type_name -> common.Error
-	3, // 2: notification.NotificationService.GetNotificationsByRecipientId:input_type -> common.IDRequest
-	4, // 3: notification.NotificationService.MarkNotificationsAsRead:input_type -> common.IDsRequest
-	3, // 4: notification.NotificationService.DeleteNotificationById:input_type -> common.IDRequest
-	0, // 5: notification.NotificationService.GetNotificationsByRecipientId:output_type -> notification.GetNotificationsByRecipientIdResponse
-	5, // 6: notification.NotificationService.MarkNotificationsAsRead:output_type -> common.EmptyResponse
-	5, // 7: notification.NotificationService.DeleteNotificationById:output_type -> common.EmptyResponse
-	5, // [5:8] is the sub-list for method output_type
-	2, // [2:5] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: notification.GetNotificationsByRecipientIdResponse.notifications:type_name -> notification.Notification
+	3, // 1: notification.GetNotificationsByRecipientIdResponse.error:type_name -> common.Error
+	4, // 2: notification.GetNotificationsByWorkIdResponse.notifications:type_name -> notification.WorkNotification
+	3, // 3: notification.GetNotificationsByWorkIdResponse.error:type_name -> common.Error
+	5, // 4: notification.NotificationService.GetNotificationsByRecipientId:input_type -> common.IDRequest
+	6, // 5: notification.NotificationService.MarkNotificationsAsRead:input_type -> common.IDsRequest
+	5, // 6: notification.NotificationService.DeleteNotificationById:input_type -> common.IDRequest
+	5, // 7: notification.NotificationService.GetNotificationByWorkId:input_type -> common.IDRequest
+	0, // 8: notification.NotificationService.GetNotificationsByRecipientId:output_type -> notification.GetNotificationsByRecipientIdResponse
+	7, // 9: notification.NotificationService.MarkNotificationsAsRead:output_type -> common.EmptyResponse
+	7, // 10: notification.NotificationService.DeleteNotificationById:output_type -> common.EmptyResponse
+	1, // 11: notification.NotificationService.GetNotificationByWorkId:output_type -> notification.GetNotificationsByWorkIdResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_notification_service_notification_proto_init() }
@@ -132,13 +195,14 @@ func file_notification_service_notification_proto_init() {
 	}
 	file_notification_service_common_notification_proto_init()
 	file_notification_service_notification_proto_msgTypes[0].OneofWrappers = []any{}
+	file_notification_service_notification_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notification_service_notification_proto_rawDesc), len(file_notification_service_notification_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

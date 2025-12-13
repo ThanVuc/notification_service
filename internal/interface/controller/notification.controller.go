@@ -37,3 +37,7 @@ func (c *NotificationController) MarkNotificationsAsRead(ctx context.Context, re
 func (c *NotificationController) DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error) {
 	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.DeleteNotificationById)
 }
+
+func (c *NotificationController) GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error) {
+	return utils.WithSafePanic(ctx, c.logger, req, c.notificationUseCase.GetNotificationByWorkId)
+}

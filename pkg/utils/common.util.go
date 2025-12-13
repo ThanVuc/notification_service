@@ -113,3 +113,10 @@ func FromObjectIdToStringPointer(hex bson.ObjectID) *string {
 	hexStr := hex.Hex()
 	return &hexStr
 }
+
+func SafeString(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}

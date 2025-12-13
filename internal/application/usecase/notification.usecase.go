@@ -89,3 +89,14 @@ func (n *notificationUseCase) DeleteNotificationById(ctx context.Context, req *c
 	}
 	return &common.EmptyResponse{}, nil
 }
+
+func (n *notificationUseCase) GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error) {
+	notifications, err := n.notificationRepo.GetNotificationByWorkId(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	notificationProtos := n.notificationMapper.FromNotificationEntitiesToWorkNotificationsProto(notifications)
+	return &notification_service.GetNotificationsByWorkIdResponse{
+		Notifications: notificationProtos,
+	}, nil
+}

@@ -23,6 +23,7 @@ const (
 	NotificationService_GetNotificationsByRecipientId_FullMethodName = "/notification.NotificationService/GetNotificationsByRecipientId"
 	NotificationService_MarkNotificationsAsRead_FullMethodName       = "/notification.NotificationService/MarkNotificationsAsRead"
 	NotificationService_DeleteNotificationById_FullMethodName        = "/notification.NotificationService/DeleteNotificationById"
+	NotificationService_GetNotificationByWorkId_FullMethodName       = "/notification.NotificationService/GetNotificationByWorkId"
 )
 
 // NotificationServiceClient is the client API for NotificationService service.
@@ -32,6 +33,7 @@ type NotificationServiceClient interface {
 	GetNotificationsByRecipientId(ctx context.Context, in *common.IDRequest, opts ...grpc.CallOption) (*GetNotificationsByRecipientIdResponse, error)
 	MarkNotificationsAsRead(ctx context.Context, in *common.IDsRequest, opts ...grpc.CallOption) (*common.EmptyResponse, error)
 	DeleteNotificationById(ctx context.Context, in *common.IDRequest, opts ...grpc.CallOption) (*common.EmptyResponse, error)
+	GetNotificationByWorkId(ctx context.Context, in *common.IDRequest, opts ...grpc.CallOption) (*GetNotificationsByWorkIdResponse, error)
 }
 
 type notificationServiceClient struct {
@@ -72,6 +74,16 @@ func (c *notificationServiceClient) DeleteNotificationById(ctx context.Context, 
 	return out, nil
 }
 
+func (c *notificationServiceClient) GetNotificationByWorkId(ctx context.Context, in *common.IDRequest, opts ...grpc.CallOption) (*GetNotificationsByWorkIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetNotificationsByWorkIdResponse)
+	err := c.cc.Invoke(ctx, NotificationService_GetNotificationByWorkId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationServiceServer is the server API for NotificationService service.
 // All implementations must embed UnimplementedNotificationServiceServer
 // for forward compatibility.
@@ -79,6 +91,7 @@ type NotificationServiceServer interface {
 	GetNotificationsByRecipientId(context.Context, *common.IDRequest) (*GetNotificationsByRecipientIdResponse, error)
 	MarkNotificationsAsRead(context.Context, *common.IDsRequest) (*common.EmptyResponse, error)
 	DeleteNotificationById(context.Context, *common.IDRequest) (*common.EmptyResponse, error)
+	GetNotificationByWorkId(context.Context, *common.IDRequest) (*GetNotificationsByWorkIdResponse, error)
 	mustEmbedUnimplementedNotificationServiceServer()
 }
 
@@ -97,6 +110,9 @@ func (UnimplementedNotificationServiceServer) MarkNotificationsAsRead(context.Co
 }
 func (UnimplementedNotificationServiceServer) DeleteNotificationById(context.Context, *common.IDRequest) (*common.EmptyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteNotificationById not implemented")
+}
+func (UnimplementedNotificationServiceServer) GetNotificationByWorkId(context.Context, *common.IDRequest) (*GetNotificationsByWorkIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNotificationByWorkId not implemented")
 }
 func (UnimplementedNotificationServiceServer) mustEmbedUnimplementedNotificationServiceServer() {}
 func (UnimplementedNotificationServiceServer) testEmbeddedByValue()                             {}
@@ -173,6 +189,24 @@ func _NotificationService_DeleteNotificationById_Handler(srv interface{}, ctx co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_GetNotificationByWorkId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.IDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).GetNotificationByWorkId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_GetNotificationByWorkId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).GetNotificationByWorkId(ctx, req.(*common.IDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationService_ServiceDesc is the grpc.ServiceDesc for NotificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,6 +225,10 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteNotificationById",
 			Handler:    _NotificationService_DeleteNotificationById_Handler,
+		},
+		{
+			MethodName: "GetNotificationByWorkId",
+			Handler:    _NotificationService_GetNotificationByWorkId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
