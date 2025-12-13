@@ -26,7 +26,7 @@ type Notification struct {
 	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
 	UpdatedAt       time.Time     `bson:"updated_at" json:"updated_at"`
 	CorrelationId   string        `bson:"correlation_id,omitempty" json:"correlation_id,omitempty"`
-	CorrelationType string        `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
+	CorrelationType int32         `bson:"correlation_type,omitempty" json:"correlation_type,omitempty"`
 	IsPublished     bool          `bson:"is_published" json:"is_published"`
 }
 

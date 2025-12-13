@@ -35,7 +35,7 @@ func (n *notificationMapper) FromProtoListToEntities(notif []*common.Notificatio
 			TriggerAt:       utils.FromTimeStampToTimePtr(notif.TriggerAt),
 			ImgUrl:          notif.ImageUrl,
 			CorrelationId:   notif.CorrelationId,
-			CorrelationType: notif.CorrelationType,
+			CorrelationType: int32(notif.CorrelationType),
 			IsPublished:     isPublished,
 			IsSendMail:      notif.IsSendMail,
 			IsActive:        notif.IsActive,
@@ -66,6 +66,20 @@ func (n *notificationMapper) FromEntityToProto(notification *entity.Notification
 		TriggerAt:       utils.FromTimePtrToTimeStamp(notification.TriggerAt),
 		ImageUrl:        notification.ImgUrl,
 		CorrelationId:   notification.CorrelationId,
-		CorrelationType: notification.CorrelationType,
+		CorrelationType: common.NOTIFICATION_TYPE(notification.CorrelationType),
 	}
+}
+
+func (n *notificationMapper) FromNotificationEntitiesToWorkNotificationsProto(notifs []*entity.Notification) []*notification_service.WorkNotification {
+	workNotifs := make([]*notification_service.WorkNotification, 0, len(notifs))
+	for _, notif := range notifs {
+		workNotifs = append(workNotifs, &notification_service.WorkNotification{
+			Id:         notif.ID.Hex(),
+			TriggerAt:  notif.TriggerAt.UnixMilli(),
+			IsSendMail: notif.IsSendMail,
+			IsActive:   notif.IsActive,
+			Link:       utils.SafeString(notif.Link),
+		})
+	}
+	return workNotifs
 }

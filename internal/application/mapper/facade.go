@@ -10,6 +10,7 @@ type (
 	NotificationMapper interface {
 		FromProtoListToEntities(notif []*common.Notification, isPublished bool) []*entity.Notification
 		FromEntitiesToProtoList(notifications []*entity.Notification) []*notification_service.Notification
+		FromNotificationEntitiesToWorkNotificationsProto(notifs []*entity.Notification) []*notification_service.WorkNotification
 	}
 )
 
