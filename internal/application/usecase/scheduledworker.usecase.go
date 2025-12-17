@@ -109,7 +109,7 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 
 				if notification.IsSendMail {
 					s.SendMailReminder(ctx, notification, userMap[notification.ReceiverIds[0]])
-					continue
+					notification.Title = "[Email] " + notification.Title
 				}
 
 				message := &messaging.Message{
