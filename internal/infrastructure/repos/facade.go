@@ -21,6 +21,7 @@ type (
 		MarkNotificationsAsRead(ctx context.Context, notificationID []bson.ObjectID) error
 		DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error
 		GetNotificationByWorkId(ctx context.Context, workId string) ([]*entity.Notification, error)
+		DeleteOldNotifications(ctx context.Context, before time.Time) error
 	}
 
 	UserNotificationRepo interface {
