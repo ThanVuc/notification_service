@@ -184,3 +184,12 @@ func (r *notificationRepo) GetNotificationByWorkId(ctx context.Context, workId s
 	}
 	return notifications, nil
 }
+
+func (r *notificationRepo) DeleteOldNotifications(ctx context.Context, before time.Time) error {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	_, err := collection.DeleteMany(
+		ctx,
+		bson.M{"trigger_at": bson.M{"$lt": before}},
+	)
+	return err
+}

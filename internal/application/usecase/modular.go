@@ -10,6 +10,7 @@ type UsecaseModule struct {
 	NotificationUseCase     NotificationUseCase
 	UserNotificationUseCase UserNotificationUseCase
 	ScheduledWorkerUseCase  ScheduledWorkerUseCase
+	CronJobUseCase          CronJobUseCase
 }
 
 func NewUsecaseModule(
@@ -40,9 +41,15 @@ func NewUsecaseModule(
 		*helperModule.EmailHelper,
 	)
 
+	cronJobUseCase := NewCronJobUseCase(
+		infrastructureModule.BaseModule.Logger,
+		infrastructureModule.RepoModule.NotificationRepo,
+	)
+
 	return &UsecaseModule{
 		NotificationUseCase:     notificationUseCase,
 		UserNotificationUseCase: userNotificationUseCase,
 		ScheduledWorkerUseCase:  scheduledWorkerUseCase,
+		CronJobUseCase:          cronJobUseCase,
 	}
 }
