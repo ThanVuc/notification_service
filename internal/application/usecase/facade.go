@@ -30,6 +30,10 @@ type (
 	ScheduledWorkerUseCase interface {
 		ProcessScheduledNotifications(ctx context.Context) error
 	}
+
+	CronJobUseCase interface {
+		ProcessDeleteOldNotifications(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
+	}
 )
 
 func NewNotificationUseCase(
@@ -73,5 +77,15 @@ func NewScheduledWorkerUseCase(
 		firebaseApp:      firebaseApp,
 		userRepo:         userRepo,
 		emailHelper:      emailHelper,
+	}
+}
+
+func NewCronJobUseCase(
+	logger log.Logger,
+	notificationRepo repos.NotificationRepo,
+) CronJobUseCase {
+	return &cronJobUseCase{
+		logger:           logger,
+		notificationRepo: notificationRepo,
 	}
 }

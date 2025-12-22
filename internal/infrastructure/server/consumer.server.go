@@ -18,5 +18,6 @@ func NewConsumerWorker(
 }
 
 func (s *ConsumerWorker) RunConsumers(ctx context.Context) {
-	s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
+	go s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
+	go s.interfaceModule.ConsumerModule.CronJobConsumer.DeleteOldNotificationsConsume(ctx)
 }
