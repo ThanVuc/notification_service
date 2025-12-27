@@ -35,13 +35,11 @@ func NewNotificationCronJob(
 }
 
 func (c *NotificationCronJob) DeleteOldNotificationsCronJob(ctx context.Context) {
-	// 1 monthly job to delete old notifications
-	loc, _ := time.LoadLocation(interface_constant.LOCATION_HCM)
-	jobScheduler := cronjob.NewCronScheduler(c.redisClient, interface_constant.DELETE_OLD_NOTIFICATIONS_CRONJOB, cron.WithLocation(loc))
+	jobScheduler := cronjob.NewCronScheduler(c.redisClient, interface_constant.DELETE_OLD_NOTIFICATIONS_CRONJOB, cron.WithLocation(time.UTC))
 
 	c.cronJobManager.AddScheduler(jobScheduler)
 
-	err := jobScheduler.ScheduleCronJob("0 0 1 * *", func() {
+	err := jobScheduler.ScheduleCronJob("0 18 1 * *", func() {
 		c.notificationUseCase.ProcessDeleteOldNotifications(ctx)
 	})
 	if err != nil {
