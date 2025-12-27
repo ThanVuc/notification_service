@@ -7,6 +7,7 @@ import (
 	"notification_service/pkg/utils"
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
+	"time"
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/thanvuc/go-core-lib/log"
@@ -99,4 +100,15 @@ func (n *notificationUseCase) GetNotificationByWorkId(ctx context.Context, req *
 	return &notification_service.GetNotificationsByWorkIdResponse{
 		Notifications: notificationProtos,
 	}, nil
+}
+
+func (n *notificationUseCase) ProcessDeleteOldNotifications(ctx context.Context) error {
+	before := time.Now().AddDate(0, 0, -30) // Delete notifications older than 30 days
+	err := n.notificationRepo.DeleteOldNotifications(context.Background(), before)
+	if err != nil {
+		n.logger.Error("Failed to delete old notifications", "", zap.Error(err))
+		return err
+	}
+	n.logger.Info("Old notifications (30 day ago) deleted successfully", "")
+	return nil
 }

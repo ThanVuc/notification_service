@@ -5,6 +5,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/thanvuc/go-core-lib/cache"
+	"github.com/thanvuc/go-core-lib/cronjob"
 	"github.com/thanvuc/go-core-lib/eventbus"
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
@@ -18,6 +19,7 @@ type BaseModule struct {
 	MongoConnector    *mongolib.MongoConnector
 	FirebaseApp       *firebase.App
 	EmailDialer       *gomail.Dialer
+	CronManager       *cronjob.CronManager
 }
 
 func NewBaseModule(
@@ -29,6 +31,7 @@ func NewBaseModule(
 	mongodbConnector := NewMongoDB(configuration, logger)
 	firebaseApp := NewFirebaseApp(configuration, logger)
 	emailDialer := NewEmailDialer(configuration, logger)
+	cronManager := NewSchedulerManager()
 
 	return &BaseModule{
 		Logger:            logger,
@@ -37,5 +40,6 @@ func NewBaseModule(
 		MongoConnector:    mongodbConnector,
 		FirebaseApp:       firebaseApp,
 		EmailDialer:       emailDialer,
+		CronManager:       cronManager,
 	}
 }

@@ -7,7 +7,6 @@ import (
 
 type ConsumerModule struct {
 	NotificationConsumer *ScheduledNotificationConsumer
-	CronJobConsumer      *CronJobConsumer
 }
 
 func NewConsumerModule(
@@ -20,14 +19,7 @@ func NewConsumerModule(
 		infrastructureModule.BaseModule.EventBusConnector,
 	)
 
-	cronJobConsumer := NewCronJobConsumer(
-		infrastructureModule.BaseModule.Logger,
-		infrastructureModule.BaseModule.EventBusConnector,
-		applicationModuel.UsecaseModular.CronJobUseCase,
-	)
-
 	return &ConsumerModule{
 		NotificationConsumer: notificationConsumer,
-		CronJobConsumer:      cronJobConsumer,
 	}
 }

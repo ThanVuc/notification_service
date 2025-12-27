@@ -21,6 +21,7 @@ type (
 		MarkNotificationsAsRead(ctx context.Context, req *common.IDsRequest) (*common.EmptyResponse, error)
 		DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error)
 		GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error)
+		ProcessDeleteOldNotifications(ctx context.Context) error
 	}
 
 	UserNotificationUseCase interface {
@@ -29,10 +30,6 @@ type (
 
 	ScheduledWorkerUseCase interface {
 		ProcessScheduledNotifications(ctx context.Context) error
-	}
-
-	CronJobUseCase interface {
-		ProcessDeleteOldNotifications(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
 )
 
@@ -77,15 +74,5 @@ func NewScheduledWorkerUseCase(
 		firebaseApp:      firebaseApp,
 		userRepo:         userRepo,
 		emailHelper:      emailHelper,
-	}
-}
-
-func NewCronJobUseCase(
-	logger log.Logger,
-	notificationRepo repos.NotificationRepo,
-) CronJobUseCase {
-	return &cronJobUseCase{
-		logger:           logger,
-		notificationRepo: notificationRepo,
 	}
 }
