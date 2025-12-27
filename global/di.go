@@ -65,12 +65,16 @@ func (c *DIContainer) StartWorker(ctx context.Context, wg *sync.WaitGroup) {
 	workerServer.RunWorkers()
 }
 
+func (c *DIContainer) StartCronJobs(ctx context.Context, wg *sync.WaitGroup) {
+	cronJobServer := server.NewCronJob(c.interfaceModule)
+	c.infrastructureModule.BaseModule.Logger.Info("Cronjob started", "")
+	cronJobServer.RunCronjob(ctx)
+}
+
 func (c *DIContainer) GracefulShutdown(wg *sync.WaitGroup) {
 	server.GracefulShutdown(
 		wg,
-		c.infrastructureModule.BaseModule.Logger,
-		*c.infrastructureModule.BaseModule.MongoConnector,
-		*c.infrastructureModule.BaseModule.CacheConnector,
-		*c.infrastructureModule.BaseModule.EventBusConnector,
+		c.infrastructureModule.BaseModule,
+		c.interfaceModule,
 	)
 }

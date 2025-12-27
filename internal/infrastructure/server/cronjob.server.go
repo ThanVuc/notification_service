@@ -5,18 +5,19 @@ import (
 	interface_modular "notification_service/internal/interface"
 )
 
-type ConsumerWorker struct {
+type CronJob struct {
 	interfaceModule *interface_modular.InterfaceModule
 }
 
-func NewConsumerWorker(
+func NewCronJob(
 	interfaceModule *interface_modular.InterfaceModule,
-) *ConsumerWorker {
-	return &ConsumerWorker{
+) *CronJob {
+	return &CronJob{
 		interfaceModule: interfaceModule,
 	}
 }
 
-func (s *ConsumerWorker) RunConsumers(ctx context.Context) {
-	go s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
+func (s *CronJob) RunCronjob(ctx context.Context) {
+	cronJobModule := s.interfaceModule.CronJobModule
+	cronJobModule.NotificationCronJob.DeleteOldNotificationsCronJob(ctx)
 }

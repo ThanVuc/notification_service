@@ -2,32 +2,33 @@ package server
 
 import (
 	"context"
+	"notification_service/internal/infrastructure/base"
+	interface_modular "notification_service/internal/interface"
 	"sync"
 
-	"github.com/thanvuc/go-core-lib/cache"
-	"github.com/thanvuc/go-core-lib/eventbus"
 	"github.com/thanvuc/go-core-lib/log"
-	"github.com/thanvuc/go-core-lib/mongolib"
 	"go.uber.org/zap"
 )
 
 func GracefulShutdown(
 	wg *sync.WaitGroup,
-	logger log.Logger,
-	mongoConector mongolib.MongoConnector,
-	redisDb cache.RedisCache,
-	eventBusConnector eventbus.RabbitMQConnector,
+	baseModule *base.BaseModule,
+	interfaceModule *interface_modular.InterfaceModule,
 ) {
 	wg.Add(1)
-	err := mongoConector.GracefulClose(context.Background(), wg)
+	interfaceModule.CronJobModule.CronManager.Shutdown(wg)
+
+	wg.Add(1)
+	logger := baseModule.Logger
+	err := baseModule.MongoConnector.GracefulClose(context.Background(), wg)
 	handleError(logger, err, "MongoDB connection closed successfully")
 
 	wg.Add(1)
-	err = redisDb.Close(wg)
+	err = baseModule.CacheConnector.Close(wg)
 	handleError(logger, err, "Redis connection closed successfully")
 
 	wg.Add(1)
-	eventBusConnector.Close(wg)
+	baseModule.EventBusConnector.Close(wg)
 
 	wg.Add(1)
 	err = logger.Sync(wg)
