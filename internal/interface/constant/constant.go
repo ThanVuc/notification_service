@@ -40,8 +40,3 @@ const (
 const (
 	DELETE_OLD_NOTIFICATIONS_CRONJOB = SCHEDULED_NOTIFICATION + "_delete_old_notifications_cronjob"
 )
-
-// location
-const (
-	LOCATION_HCM = "Asia/Ho_Chi_Minh"
-)
