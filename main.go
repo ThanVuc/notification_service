@@ -24,6 +24,9 @@ func main() {
 	// run grpc server in main goroutine
 	go cmd.RunGrpcServer(ctx, &wg, diContainer)
 
+	// run cronjob server in another goroutine
+	go cmd.RunCronJobServer(ctx, &wg, diContainer)
+
 	// run console test in main goroutine
 	// cmd.RunConsoleTest(ctx, diContainer.GetInfrastructureModule())
 

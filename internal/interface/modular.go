@@ -5,6 +5,7 @@ import (
 	"notification_service/internal/infrastructure"
 	"notification_service/internal/interface/consumer"
 	"notification_service/internal/interface/controller"
+	"notification_service/internal/interface/cronjob"
 	"notification_service/internal/interface/worker"
 )
 
@@ -12,6 +13,7 @@ type InterfaceModule struct {
 	ControllerModule *controller.ControllerModule
 	ConsumerModule   *consumer.ConsumerModule
 	WorkerModule     *worker.WorkerModule
+	CronJobModule    *cronjob.CronJobModule
 }
 
 func NewInterfaceModule(
@@ -20,11 +22,13 @@ func NewInterfaceModule(
 ) *InterfaceModule {
 	controllerModule := controller.NewControllerModule(applicationModule, infrastructureModule)
 	consumerModule := consumer.NewConsumerModule(applicationModule, infrastructureModule)
-	WorkerModule := worker.NewWorkerModule(applicationModule, infrastructureModule)
+	workerModule := worker.NewWorkerModule(applicationModule, infrastructureModule)
+	cronJobModule := cronjob.NewCronJobModule(applicationModule, infrastructureModule)
 
 	return &InterfaceModule{
 		ControllerModule: controllerModule,
 		ConsumerModule:   consumerModule,
-		WorkerModule:     WorkerModule,
+		WorkerModule:     workerModule,
+		CronJobModule:    cronJobModule,
 	}
 }
