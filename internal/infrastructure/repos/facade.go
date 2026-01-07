@@ -16,7 +16,6 @@ type (
 		GetNotificationsByRecipientID(ctx context.Context, request *common.IDRequest) ([]*entity.Notification, error)
 		UpsertNotifications(ctx context.Context, notifications []*entity.Notification) error
 		GetNotificationsWithinTimeRange(ctx context.Context, startTime, endTime time.Time) ([]*entity.Notification, error)
-		InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error
 		MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error
 		MarkNotificationsAsRead(ctx context.Context, notificationID []bson.ObjectID) error
 		DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error
