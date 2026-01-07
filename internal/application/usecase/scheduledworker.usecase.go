@@ -130,12 +130,6 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 				}
 				publishedIDs = append(publishedIDs, notification.ID)
 			}
-			// Mark notifications as sent
-			if len(publishedIDs) > 0 {
-				if err := s.notificationRepo.MarkIsPublished(ctx, publishedIDs); err != nil {
-					s.logger.Error("Failed to mark notifications as sent", "", zap.Error(err))
-				}
-			}
 
 			// Clean after sending
 			delete(notificationMap, currentTime)

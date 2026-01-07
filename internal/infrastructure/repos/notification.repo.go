@@ -51,10 +51,9 @@ func (r *notificationRepo) UpsertNotifications(ctx context.Context, notification
 	models := make([]mongo.WriteModel, 0, len(notifications))
 
 	for _, n := range notifications {
-		if !n.ID.IsZero() {
+		if n.ID.IsZero() {
 			n.ID = bson.NewObjectID()
 		}
-
 		filter := bson.M{"_id": n.ID}
 
 		update := bson.M{
@@ -69,11 +68,14 @@ func (r *notificationRepo) UpsertNotifications(ctx context.Context, notification
 				"img_url":          n.ImgUrl,
 				"is_email_sent":    n.IsSendMail,
 				"is_active":        n.IsActive,
-				"created_at":       n.CreatedAt,
 				"updated_at":       n.UpdatedAt,
 				"correlation_id":   n.CorrelationId,
 				"correlation_type": n.CorrelationType,
 				"is_published":     n.IsPublished,
+			},
+			"$setOnInsert": bson.M{
+				"_id":        n.ID,
+				"created_at": n.CreatedAt,
 			},
 		}
 
@@ -100,7 +102,7 @@ func (r *notificationRepo) GetNotificationsWithinTimeRange(ctx context.Context, 
 			"$gte": startTime,
 			"$lte": endTime,
 		},
-		"is_active": true,
+		"is_published": false,
 	}
 
 	cursor, err := collection.Find(ctx, filter)
@@ -120,22 +122,11 @@ func (r *notificationRepo) GetNotificationsWithinTimeRange(ctx context.Context, 
 		notificationIDs[i] = notification.ID
 	}
 
-	if err := r.InvalidateNotifications(ctx, notificationIDs); err != nil {
+	if err := r.MarkIsPublished(ctx, notificationIDs); err != nil {
 		return nil, fmt.Errorf("failed to invalidate notifications: %w", err)
 	}
 
 	return notifications, nil
-}
-
-func (r *notificationRepo) InvalidateNotifications(ctx context.Context, notificationIDs []bson.ObjectID) error {
-	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
-	_, err := collection.UpdateMany(
-		ctx,
-		bson.M{"_id": bson.M{"$in": notificationIDs}},
-		bson.M{"$set": bson.M{"is_active": false}},
-	)
-
-	return err
 }
 
 func (r *notificationRepo) MarkIsPublished(ctx context.Context, notificationID []bson.ObjectID) error {
