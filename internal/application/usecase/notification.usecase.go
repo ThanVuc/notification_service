@@ -112,3 +112,8 @@ func (n *notificationUseCase) ProcessDeleteOldNotifications(ctx context.Context)
 	n.logger.Info("Old notifications (30 day ago) deleted successfully", "")
 	return nil
 }
+
+func (n *notificationUseCase) ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
+	// Implement the logic to process work generation messages
+	return rabbitmq.Ack
+}
