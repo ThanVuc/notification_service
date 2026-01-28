@@ -22,6 +22,7 @@ type (
 		DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error)
 		GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error)
 		ProcessDeleteOldNotifications(ctx context.Context) error
+		ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
 
 	UserNotificationUseCase interface {
