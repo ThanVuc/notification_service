@@ -28,21 +28,41 @@ func (h *EmailHelper) SendScheduledWorkEmail(to string, data app_model.EmailData
 		return err
 	}
 
+	m := BuildMessageBody(app_constant.APP_EMAIL, to, data.Title, textBody, htmlBody)
+
+	// Send using the helper's dialer
+	return h.emailDialer.DialAndSend(m)
+}
+
+func (h *EmailHelper) SendAIWorkGenerationEmail(to string, data app_model.EmailData) error {
+	htmlBody, err := RenderEmailTemplate(app_template.AIWorkGenerationEmailHTML, data)
+	if err != nil {
+		return err
+	}
+	textBody, err := RenderEmailTemplate(app_template.AIWorkGenerationEmailPlain, data)
+	if err != nil {
+		return err
+	}
+	m := BuildMessageBody(app_constant.APP_EMAIL, to, data.Title, textBody, htmlBody)
+
+	// Send using the helper's dialer
+	return h.emailDialer.DialAndSend(m)
+}
+
+func BuildMessageBody(from, to, title, textBody, htmlBody string) *gomail.Message {
 	m := gomail.NewMessage()
 
 	// From + To + Subject
-	m.SetHeader("From", app_constant.APP_EMAIL)
+	m.SetHeader("From", from)
 	m.SetHeader("To", to)
-	m.SetHeader("Subject", data.Title)
+	m.SetHeader("Subject", title)
 
 	// Add text fallback
 	m.AddAlternative("text/plain", textBody)
 
 	// Add HTML version
 	m.AddAlternative("text/html", htmlBody)
-
-	// Send using the helper's dialer
-	return h.emailDialer.DialAndSend(m)
+	return m
 }
 
 func RenderEmail(data app_model.EmailData) (htmlBody string, textBody string, err error) {
@@ -69,4 +89,16 @@ func RenderEmail(data app_model.EmailData) (htmlBody string, textBody string, er
 	}
 
 	return htmlBuf.String(), textBuf.String(), nil
+}
+
+func RenderEmailTemplate(tpl string, data app_model.EmailData) (string, error) {
+	t, err := template.New("").Parse(tpl)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, data); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

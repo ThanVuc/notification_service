@@ -42,7 +42,7 @@ func CreateNotificationCollection(
 	notificationValidator := bson.M{
 		"$jsonSchema": bson.M{
 			"bsonType": "object",
-			"required": []string{"_id", "message", "sender_id", "receiver_ids", "created_at", "updated_at"},
+			"required": []string{"message", "sender_id", "receiver_ids", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
 					"bsonType":    []string{"objectId"},

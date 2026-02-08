@@ -184,3 +184,38 @@ func (r *notificationRepo) DeleteOldNotifications(ctx context.Context, before ti
 	)
 	return err
 }
+
+func (r *notificationRepo) UpsertNotification(ctx context.Context, notification *entity.Notification) error {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	if notification.ID.IsZero() {
+		notification.ID = bson.NewObjectID()
+	}
+
+	filter := bson.M{"_id": notification.ID}
+
+	update := bson.M{
+		"$set": bson.M{
+			"title":            notification.Title,
+			"message":          notification.Message,
+			"link":             notification.Link,
+			"sender_id":        notification.SenderId,
+			"receiver_ids":     notification.ReceiverIds,
+			"is_read":          notification.IsRead,
+			"trigger_at":       notification.TriggerAt,
+			"img_url":          notification.ImgUrl,
+			"is_email_sent":    notification.IsSendMail,
+			"is_active":        notification.IsActive,
+			"updated_at":       notification.UpdatedAt,
+			"correlation_id":   notification.CorrelationId,
+			"correlation_type": notification.CorrelationType,
+			"is_published":     notification.IsPublished,
+		},
+		"$setOnInsert": bson.M{
+			"_id":        notification.ID,
+			"created_at": notification.CreatedAt,
+		},
+	}
+	opts := options.UpdateOne().SetUpsert(true)
+	_, err := collection.UpdateOne(ctx, filter, update, opts)
+	return err
+}

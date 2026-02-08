@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/thanvuc/go-core-lib/log"
+	"github.com/wagslane/go-rabbitmq"
 	"go.uber.org/zap"
 )
 
@@ -26,17 +27,27 @@ func WithSafePanic[TReq any, TResp any](
 	return f(ctx, req)
 }
 
-func WithSafePanicConsumer(ctx context.Context, logger log.Logger, f func(context.Context)) {
-	defer func() {
-		if r := recover(); r != nil {
-			logger.Error("Recovered from panic",
-				"",
-				zap.Any("error", r),
-			)
-		}
-	}()
+func WithSafePanicEventBus(
+	logger log.Logger,
+	handler func(d rabbitmq.Delivery) rabbitmq.Action,
+) func(d rabbitmq.Delivery) rabbitmq.Action {
 
-	f(ctx)
+	return func(d rabbitmq.Delivery) (action rabbitmq.Action) {
+		defer func() {
+			if r := recover(); r != nil {
+				logger.Error(
+					"panic recovered in consumer handler",
+					"",
+					zap.Any("panic", r),
+					zap.Stack("stacktrace"),
+				)
+				// 🚨 panic = poison message
+				action = rabbitmq.NackDiscard
+			}
+		}()
+
+		return handler(d)
+	}
 }
 
 func WithSafePanicSimple(

@@ -55,3 +55,16 @@ func (r *userNotificationRepo) GetUsersByIDs(ctx context.Context, userIDs []stri
 	}
 	return users, nil
 }
+
+func (r *userNotificationRepo) GetUsersByID(ctx context.Context, userID string) (*entity.User, error) {
+	collection := r.mongoConnector.GetCollection(constant.CollectionUser)
+	filter := bson.M{
+		"user_id": userID,
+	}
+	var user entity.User
+	err := collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

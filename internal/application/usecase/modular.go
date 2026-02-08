@@ -24,6 +24,8 @@ func NewUsecaseModule(
 		infrastructureModule.RepoModule.NotificationRepo,
 		infrastructureModule.BaseModule.FirebaseApp,
 		mapperModule.NotificationMapper,
+		infrastructureModule.RepoModule.UserNotificationRepo,
+		*helperModule.EmailHelper,
 	)
 
 	userNotificationUseCase := NewUserNotificationUseCase(
