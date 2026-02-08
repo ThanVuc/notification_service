@@ -40,6 +40,8 @@ func NewNotificationUseCase(
 	notificationRepo repos.NotificationRepo,
 	firebaseApp *firebase.App,
 	notificationMapper mapper.NotificationMapper,
+	userRepo repos.UserNotificationRepo,
+	emailHelper helper.EmailHelper,
 ) NotificationUseCase {
 	return &notificationUseCase{
 		mongodbConnector:   mongodbConnector,
@@ -47,6 +49,8 @@ func NewNotificationUseCase(
 		notificationRepo:   notificationRepo,
 		firebaseApp:        firebaseApp,
 		notificationMapper: notificationMapper,
+		userRepo:           userRepo,
+		emailHelper:        emailHelper,
 	}
 }
 

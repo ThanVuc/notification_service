@@ -120,3 +120,10 @@ func SafeString(s *string) string {
 	}
 	return *s
 }
+
+func SafeStringWithDefault(ptr *string, def string) string {
+	if ptr == nil || *ptr == "" {
+		return def
+	}
+	return *ptr
+}
