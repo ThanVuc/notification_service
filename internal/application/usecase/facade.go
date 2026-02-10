@@ -22,6 +22,7 @@ type (
 		DeleteNotificationById(ctx context.Context, req *common.IDRequest) (*common.EmptyResponse, error)
 		GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error)
 		ProcessDeleteOldNotifications(ctx context.Context) error
+		ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
 
 	UserNotificationUseCase interface {
@@ -39,6 +40,8 @@ func NewNotificationUseCase(
 	notificationRepo repos.NotificationRepo,
 	firebaseApp *firebase.App,
 	notificationMapper mapper.NotificationMapper,
+	userRepo repos.UserNotificationRepo,
+	emailHelper helper.EmailHelper,
 ) NotificationUseCase {
 	return &notificationUseCase{
 		mongodbConnector:   mongodbConnector,
@@ -46,6 +49,8 @@ func NewNotificationUseCase(
 		notificationRepo:   notificationRepo,
 		firebaseApp:        firebaseApp,
 		notificationMapper: notificationMapper,
+		userRepo:           userRepo,
+		emailHelper:        emailHelper,
 	}
 }
 

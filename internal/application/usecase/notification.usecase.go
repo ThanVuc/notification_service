@@ -2,14 +2,21 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
+	"notification_service/internal/application/dto"
+	"notification_service/internal/application/helper"
 	"notification_service/internal/application/mapper"
+	app_model "notification_service/internal/application/model"
+	"notification_service/internal/core/entity"
 	"notification_service/internal/infrastructure/repos"
 	"notification_service/pkg/utils"
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
+	"strconv"
 	"time"
 
 	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/messaging"
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
 	"github.com/wagslane/go-rabbitmq"
@@ -24,6 +31,8 @@ type notificationUseCase struct {
 	notificationRepo   repos.NotificationRepo
 	firebaseApp        *firebase.App
 	notificationMapper mapper.NotificationMapper
+	userRepo           repos.UserNotificationRepo
+	emailHelper        helper.EmailHelper
 }
 
 func (n *notificationUseCase) GetNotificationsByRecipientId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByRecipientIdResponse, error) {
@@ -54,7 +63,7 @@ func (n *notificationUseCase) ConsumeScheduledNotification(ctx context.Context, 
 	err = n.notificationRepo.UpsertNotifications(ctx, notificationEntities)
 	if err != nil {
 		n.logger.Error("Failed to save scheduled notification", requestId, zap.Error(err))
-		return rabbitmq.NackRequeue
+		return rabbitmq.NackDiscard
 	}
 
 	return rabbitmq.Ack
@@ -111,4 +120,118 @@ func (n *notificationUseCase) ProcessDeleteOldNotifications(ctx context.Context)
 	}
 	n.logger.Info("Old notifications (30 day ago) deleted successfully", "")
 	return nil
+}
+
+func (n *notificationUseCase) ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
+	notificationMessage, err := n.DecodeWorkMessage(d.Body)
+	if err != nil {
+		n.logger.Error("Failed to decode notification generation message", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	// build notification entities
+	now := time.Now().UTC()
+	notificationEntity := &entity.Notification{
+		ID:              bson.NewObjectID(),
+		Title:           notificationMessage.Title,
+		Message:         notificationMessage.Message,
+		Link:            notificationMessage.Link,
+		SenderId:        notificationMessage.SenderID,
+		ReceiverIds:     notificationMessage.ReceiverIDs,
+		IsRead:          false,
+		TriggerAt:       &now,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+		ImgUrl:          notificationMessage.ImageURL,
+		CorrelationId:   notificationMessage.CorrelationID,
+		CorrelationType: int32(notificationMessage.CorrelationType),
+		IsActive:        true,
+		IsSendMail:      true,
+		IsPublished:     false,
+	}
+
+	// save before send noti
+	err = n.notificationRepo.UpsertNotification(ctx, notificationEntity)
+	if err != nil {
+		n.logger.Error("Failed to save work generation notification", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	// send mail & notifications
+	if len(notificationMessage.ReceiverIDs) == 0 {
+		n.logger.Warn("No receiver IDs found for work generation notification", "")
+		return rabbitmq.Ack
+	}
+	println("user-id", notificationMessage.ReceiverIDs[0])
+	user, err := n.userRepo.GetUsersByID(ctx, notificationMessage.ReceiverIDs[0])
+	if err != nil {
+		n.logger.Error("Failed to get user for work generation notification", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	if user == nil {
+		n.logger.Warn("User not found for work generation notification", "")
+		return rabbitmq.Ack
+	}
+
+	if err := n.SendAIGenerationMail(ctx, notificationEntity, user); err != nil {
+		n.logger.Error("Error sending AI generation email", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	message := &messaging.Message{
+		Token: user.FCMToken,
+		Data: map[string]string{
+			"title":      notificationEntity.Title,
+			"body":       notificationEntity.Message,
+			"url":        utils.SafeStringWithDefault(notificationEntity.Link, "https://www.schedulr.site/images/ai-icon.webp"),
+			"src":        utils.SafeStringWithDefault(notificationEntity.ImgUrl, "https://www.schedulr.site/schedule/daily"),
+			"trigger_at": strconv.FormatInt(notificationEntity.TriggerAt.UnixMilli(), 10),
+		},
+	}
+
+	firebaseClient, err := n.firebaseApp.Messaging(ctx)
+	if err != nil {
+		n.logger.Error("Failed to init firebase messaging", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	if _, err := firebaseClient.Send(ctx, message); err != nil {
+		n.logger.Error("Error sending work generation notification", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	// update notification as sent
+	err = n.notificationRepo.MarkIsPublished(ctx, []bson.ObjectID{notificationEntity.ID})
+	if err != nil {
+		n.logger.Error("Failed to mark work generation notification as published", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	n.logger.Info("Work generation notification sent successfully", "")
+
+	return rabbitmq.Ack
+}
+
+func (n *notificationUseCase) DecodeWorkMessage(body []byte) (*dto.WorkGenerationNotificationMessage, error) {
+	var notifications dto.WorkGenerationNotificationMessage
+
+	if err := json.Unmarshal(body, &notifications); err != nil {
+		return nil, err
+	}
+
+	return &notifications, nil
+}
+
+func (n *notificationUseCase) SendAIGenerationMail(ctx context.Context, notification *entity.Notification, user *entity.User) error {
+	err := n.emailHelper.SendAIWorkGenerationEmail(
+		user.Email,
+		app_model.EmailData{
+			Title:      notification.Title,
+			Message:    notification.Message,
+			Link:       *notification.Link,
+			ButtonText: "Click vào đây để xem công việc đã sinh.",
+		},
+	)
+	return err
 }

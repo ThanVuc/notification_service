@@ -21,11 +21,13 @@ type (
 		DeleteNotificationById(ctx context.Context, notificationID bson.ObjectID) error
 		GetNotificationByWorkId(ctx context.Context, workId string) ([]*entity.Notification, error)
 		DeleteOldNotifications(ctx context.Context, before time.Time) error
+		UpsertNotification(ctx context.Context, notification *entity.Notification) error
 	}
 
 	UserNotificationRepo interface {
 		UpsertUserNotification(ctx context.Context, user *entity.User) error
 		GetUsersByIDs(ctx context.Context, userIDs []string) ([]*entity.User, error)
+		GetUsersByID(ctx context.Context, userID string) (*entity.User, error)
 	}
 )
 

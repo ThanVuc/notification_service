@@ -6,7 +6,8 @@ import (
 )
 
 type ConsumerModule struct {
-	NotificationConsumer *ScheduledNotificationConsumer
+	NotificationConsumer   *ScheduledNotificationConsumer
+	GenerationWorkConsumer *WorkGenerationConsumer
 }
 
 func NewConsumerModule(
@@ -19,7 +20,14 @@ func NewConsumerModule(
 		infrastructureModule.BaseModule.EventBusConnector,
 	)
 
+	generationWorkConsumer := NewWorkGenerationConsumer(
+		applicationModuel.UsecaseModular.NotificationUseCase,
+		infrastructureModule.BaseModule.Logger,
+		infrastructureModule.BaseModule.EventBusConnector,
+	)
+
 	return &ConsumerModule{
-		NotificationConsumer: notificationConsumer,
+		NotificationConsumer:   notificationConsumer,
+		GenerationWorkConsumer: generationWorkConsumer,
 	}
 }
