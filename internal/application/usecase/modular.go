@@ -26,6 +26,7 @@ func NewUsecaseModule(
 		mapperModule.NotificationMapper,
 		infrastructureModule.RepoModule.UserNotificationRepo,
 		*helperModule.EmailHelper,
+		infrastructureModule.BaseModule.Dispatcher,
 	)
 
 	userNotificationUseCase := NewUserNotificationUseCase(

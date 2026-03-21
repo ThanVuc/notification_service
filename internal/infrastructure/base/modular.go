@@ -20,6 +20,7 @@ type BaseModule struct {
 	FirebaseApp       *firebase.App
 	EmailDialer       *gomail.Dialer
 	CronManager       *cronjob.CronManager
+	Dispatcher        *Dispatcher
 }
 
 func NewBaseModule(
@@ -32,6 +33,7 @@ func NewBaseModule(
 	firebaseApp := NewFirebaseApp(configuration, logger)
 	emailDialer := NewEmailDialer(configuration, logger)
 	cronManager := NewSchedulerManager()
+	dispatcher := NewDispatcher()
 
 	return &BaseModule{
 		Logger:            logger,
@@ -41,5 +43,6 @@ func NewBaseModule(
 		FirebaseApp:       firebaseApp,
 		EmailDialer:       emailDialer,
 		CronManager:       cronManager,
+		Dispatcher:        dispatcher,
 	}
 }

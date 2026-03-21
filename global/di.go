@@ -62,7 +62,7 @@ func (c *DIContainer) StartComsumerWorkers(ctx context.Context, wg *sync.WaitGro
 func (c *DIContainer) StartWorker(ctx context.Context, wg *sync.WaitGroup) {
 	workerServer := server.NewWorker(c.interfaceModule)
 	c.infrastructureModule.BaseModule.Logger.Info("Worker started", "")
-	workerServer.RunWorkers()
+	workerServer.RunWorkers(ctx, wg)
 }
 
 func (c *DIContainer) StartCronJobs(ctx context.Context, wg *sync.WaitGroup) {

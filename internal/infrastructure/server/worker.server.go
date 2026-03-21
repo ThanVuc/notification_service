@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	interface_modular "notification_service/internal/interface"
+	"sync"
 )
 
 type Worker struct {
@@ -17,7 +18,27 @@ func NewWorker(
 	}
 }
 
-func (s *Worker) RunWorkers() {
-	ctx := context.Background()
-	go s.interfaceModule.WorkerModule.ScheduledNotificationWorker.RunScheduledNotifications(ctx)
+func (s *Worker) RunWorkers(ctx context.Context, wg *sync.WaitGroup) {
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		s.interfaceModule.WorkerModule.ScheduledNotificationWorker.RunScheduledNotifications(ctx)
+	}()
+
+	for range 2 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.interfaceModule.WorkerModule.AppNotificationWorker.Start(ctx)
+		}()
+	}
+
+	for range 2 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.interfaceModule.WorkerModule.EmailNotificationWorker.Start(ctx)
+		}()
+	}
 }
