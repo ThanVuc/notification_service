@@ -34,6 +34,10 @@ func GracefulShutdown(
 	err = logger.Sync(wg)
 	handleError(logger, err, "Logger synced successfully")
 
+	if baseModule.Dispatcher != nil {
+		baseModule.Dispatcher.Close()
+	}
+
 	wg.Wait()
 }
 

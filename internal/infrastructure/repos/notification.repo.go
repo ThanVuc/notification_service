@@ -219,3 +219,18 @@ func (r *notificationRepo) UpsertNotification(ctx context.Context, notification 
 	_, err := collection.UpdateOne(ctx, filter, update, opts)
 	return err
 }
+
+func (r *notificationRepo) GetNotificationsByID(ctx context.Context, id string) (*entity.Notification, error) {
+	collection := r.mongoConnector.GetCollection(constant.CollectionNotification)
+	bsonId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{"_id": bsonId}
+	var notification entity.Notification
+	err = collection.FindOne(ctx, filter).Decode(&notification)
+	if err != nil {
+		return nil, err
+	}
+	return &notification, nil
+}

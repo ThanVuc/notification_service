@@ -67,3 +67,21 @@ func WithSafePanicSimple(
 
 	return f(ctx)
 }
+
+func WithSafeWorkerPanic[TReq any, TResp any](
+	ctx context.Context,
+	logger log.Logger,
+	req TReq,
+	f func(context.Context, TReq) (TResp, error),
+) (TResp, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Error("Recovered from panic",
+				"Worker panic",
+				zap.Any("error", r),
+			)
+		}
+	}()
+
+	return f(ctx, req)
+}

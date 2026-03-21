@@ -8,6 +8,7 @@ import (
 	"notification_service/internal/application/mapper"
 	app_model "notification_service/internal/application/model"
 	"notification_service/internal/core/entity"
+	"notification_service/internal/infrastructure/base"
 	"notification_service/internal/infrastructure/repos"
 	"notification_service/pkg/utils"
 	"notification_service/proto/common"
@@ -33,6 +34,7 @@ type notificationUseCase struct {
 	notificationMapper mapper.NotificationMapper
 	userRepo           repos.UserNotificationRepo
 	emailHelper        helper.EmailHelper
+	dispatcher         *base.Dispatcher
 }
 
 func (n *notificationUseCase) GetNotificationsByRecipientId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByRecipientIdResponse, error) {
@@ -100,6 +102,7 @@ func (n *notificationUseCase) DeleteNotificationById(ctx context.Context, req *c
 	return &common.EmptyResponse{}, nil
 }
 
+// It actually get notifications by entity ids, but we keep the name for compatibility
 func (n *notificationUseCase) GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error) {
 	notifications, err := n.notificationRepo.GetNotificationByWorkId(ctx, req.Id)
 	if err != nil {
@@ -162,7 +165,6 @@ func (n *notificationUseCase) ConsumeWorkGeneration(ctx context.Context, d rabbi
 		n.logger.Warn("No receiver IDs found for work generation notification", "")
 		return rabbitmq.Ack
 	}
-	println("user-id", notificationMessage.ReceiverIDs[0])
 	user, err := n.userRepo.GetUsersByID(ctx, notificationMessage.ReceiverIDs[0])
 	if err != nil {
 		n.logger.Error("Failed to get user for work generation notification", "", zap.Error(err))
@@ -234,4 +236,196 @@ func (n *notificationUseCase) SendAIGenerationMail(ctx context.Context, notifica
 		},
 	)
 	return err
+}
+
+func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action {
+	teamMessage, err := n.DecodeTeamMessage(d.Body)
+	if err != nil {
+		n.logger.Error("Failed to decode team notification message", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	if len(teamMessage.ReceiverIDs) == 0 {
+		n.logger.Warn("No receiver IDs found for team notification", "")
+		return rabbitmq.Ack
+	}
+
+	now := time.Now().UTC()
+	notificationEntity := &entity.Notification{
+		ID:              bson.NewObjectID(),
+		Title:           teamMessage.Payload.Title,
+		Message:         teamMessage.Payload.Message,
+		Link:            teamMessage.Payload.Link,
+		SenderId:        teamMessage.SenderID,
+		ReceiverIds:     teamMessage.ReceiverIDs,
+		IsRead:          false,
+		TriggerAt:       &now,
+		ImgUrl:          teamMessage.Payload.ImageURL,
+		IsSendMail:      teamMessage.Metadata.IsSentMail,
+		IsActive:        true,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+		CorrelationId:   teamMessage.Payload.CorrelationID,
+		CorrelationType: int32(teamMessage.Payload.CorrelationType),
+		IsPublished:     false,
+	}
+
+	if err := n.notificationRepo.UpsertNotification(ctx, notificationEntity); err != nil {
+		n.logger.Error("Failed to save team notification", "", zap.Error(err))
+		return rabbitmq.NackDiscard
+	}
+
+	job := base.NotificationJob{NotificationID: notificationEntity.ID.Hex(), RetryCount: 0}
+	if !n.enqueueJob(ctx, n.dispatcher.AppChan, job, "app") {
+		return rabbitmq.NackRequeue
+	}
+
+	if notificationEntity.IsSendMail {
+		if !n.enqueueJob(ctx, n.dispatcher.EmailChan, job, "email") {
+			return rabbitmq.NackRequeue
+		}
+	}
+
+	return rabbitmq.Ack
+}
+
+func (n *notificationUseCase) SendEmailNotifications(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			n.logger.Info("Email notification worker stopped", "")
+			return nil
+		case job, ok := <-n.dispatcher.EmailChan:
+			if !ok {
+				n.logger.Info("Email notification channel closed", "")
+				return nil
+			}
+
+			if err := n.processEmailJob(ctx, job); err != nil {
+				n.logger.Error("Failed to process email notification job", "", zap.Error(err), zap.String("notification_id", job.NotificationID))
+			}
+		}
+	}
+}
+
+func (n *notificationUseCase) SendAppNotifications(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			n.logger.Info("App notification worker stopped", "")
+			return nil
+		case job, ok := <-n.dispatcher.AppChan:
+			if !ok {
+				n.logger.Info("App notification channel closed", "")
+				return nil
+			}
+
+			if err := n.processAppJob(ctx, job); err != nil {
+				n.logger.Error("Failed to process app notification job", "", zap.Error(err), zap.String("notification_id", job.NotificationID))
+			}
+		}
+	}
+}
+
+func (n *notificationUseCase) DecodeTeamMessage(body []byte) (*dto.TeamNotificationMessage, error) {
+	var message dto.TeamNotificationMessage
+
+	if err := json.Unmarshal(body, &message); err != nil {
+		return nil, err
+	}
+
+	return &message, nil
+}
+
+func (n *notificationUseCase) enqueueJob(ctx context.Context, ch chan base.NotificationJob, job base.NotificationJob, channelName string) bool {
+	select {
+	case <-ctx.Done():
+		return false
+	case ch <- job:
+		return true
+	default:
+		n.logger.Warn("Notification channel is full", "", zap.String("channel", channelName), zap.String("notification_id", job.NotificationID))
+		return false
+	}
+}
+
+func (n *notificationUseCase) processEmailJob(ctx context.Context, job base.NotificationJob) error {
+	notification, err := n.notificationRepo.GetNotificationsByID(ctx, job.NotificationID)
+	if err != nil {
+		return err
+	}
+
+	users, err := n.userRepo.GetUsersByIDs(ctx, notification.ReceiverIds)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		if user == nil || user.Email == "" {
+			continue
+		}
+
+		if err := n.emailHelper.SendScheduledWorkEmail(
+			user.Email,
+			app_model.EmailData{
+				Title:      notification.Title,
+				Message:    notification.Message,
+				Link:       utils.SafeString(notification.Link),
+				ButtonText: "Xem chi tiết",
+			},
+		); err != nil {
+			n.logger.Error("Failed to send email notification", "", zap.Error(err), zap.String("notification_id", job.NotificationID), zap.String("receiver_id", user.UserID))
+		}
+	}
+
+	return nil
+}
+
+func (n *notificationUseCase) processAppJob(ctx context.Context, job base.NotificationJob) error {
+	notification, err := n.notificationRepo.GetNotificationsByID(ctx, job.NotificationID)
+	if err != nil {
+		return err
+	}
+
+	users, err := n.userRepo.GetUsersByIDs(ctx, notification.ReceiverIds)
+	if err != nil {
+		return err
+	}
+
+	firebaseClient, err := n.firebaseApp.Messaging(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		if user == nil || user.FCMToken == "" {
+			continue
+		}
+
+		triggerAt := ""
+		if notification.TriggerAt != nil {
+			triggerAt = strconv.FormatInt(notification.TriggerAt.UnixMilli(), 10)
+		}
+
+		message := &messaging.Message{
+			Token: user.FCMToken,
+			Data: map[string]string{
+				"title":      notification.Title,
+				"body":       notification.Message,
+				"url":        utils.SafeString(notification.Link),
+				"src":        utils.SafeString(notification.ImgUrl),
+				"trigger_at": triggerAt,
+			},
+		}
+		if _, err := firebaseClient.Send(ctx, message); err != nil {
+			n.logger.Error("Failed to send app notification", "", zap.Error(err), zap.String("notification_id", job.NotificationID), zap.String("receiver_id", user.UserID))
+		}
+	}
+
+	notificationID, err := bson.ObjectIDFromHex(job.NotificationID)
+	if err != nil {
+		return err
+	}
+
+	return n.notificationRepo.MarkIsPublished(ctx, []bson.ObjectID{notificationID})
 }
