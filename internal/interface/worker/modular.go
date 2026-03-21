@@ -7,6 +7,8 @@ import (
 
 type WorkerModule struct {
 	ScheduledNotificationWorker *ScheduledNotificationWorker
+	AppNotificationWorker       *AppNotificationWorker
+	EmailNotificationWorker     *EmailNotificationWorker
 }
 
 func NewWorkerModule(
@@ -17,7 +19,20 @@ func NewWorkerModule(
 		applicationModule.UsecaseModular.ScheduledWorkerUseCase,
 		infrastructureModule.BaseModule.Logger,
 	)
+
+	AppNotificationWorker := NewAppNotificationWorker(
+		applicationModule.UsecaseModular.NotificationUseCase,
+		infrastructureModule.BaseModule.Logger,
+	)
+
+	EmailNotificationWorker := NewEmailNotificationWorker(
+		applicationModule.UsecaseModular.NotificationUseCase,
+		infrastructureModule.BaseModule.Logger,
+	)
+
 	return &WorkerModule{
 		ScheduledNotificationWorker: ScheduledNotificationWorker,
+		AppNotificationWorker:       AppNotificationWorker,
+		EmailNotificationWorker:     EmailNotificationWorker,
 	}
 }

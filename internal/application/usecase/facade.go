@@ -4,6 +4,7 @@ import (
 	"context"
 	"notification_service/internal/application/helper"
 	"notification_service/internal/application/mapper"
+	"notification_service/internal/infrastructure/base"
 	"notification_service/internal/infrastructure/repos"
 	"notification_service/proto/common"
 	"notification_service/proto/notification_service"
@@ -23,6 +24,9 @@ type (
 		GetNotificationByWorkId(ctx context.Context, req *common.IDRequest) (*notification_service.GetNotificationsByWorkIdResponse, error)
 		ProcessDeleteOldNotifications(ctx context.Context) error
 		ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
+		SendEmailNotifications(ctx context.Context) error
+		SendAppNotifications(ctx context.Context) error
+		ConsumeTeamNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
 
 	UserNotificationUseCase interface {
@@ -42,6 +46,7 @@ func NewNotificationUseCase(
 	notificationMapper mapper.NotificationMapper,
 	userRepo repos.UserNotificationRepo,
 	emailHelper helper.EmailHelper,
+	dispatcher *base.Dispatcher,
 ) NotificationUseCase {
 	return &notificationUseCase{
 		mongodbConnector:   mongodbConnector,
@@ -51,6 +56,7 @@ func NewNotificationUseCase(
 		notificationMapper: notificationMapper,
 		userRepo:           userRepo,
 		emailHelper:        emailHelper,
+		dispatcher:         dispatcher,
 	}
 }
 

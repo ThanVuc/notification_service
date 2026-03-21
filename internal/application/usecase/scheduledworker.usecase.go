@@ -114,6 +114,10 @@ func (s *scheduledWorkerUsecase) ProcessScheduledNotifications(ctx context.Conte
 
 				message := &messaging.Message{
 					Token: userMap[notification.ReceiverIds[0]].FCMToken,
+					Notification: &messaging.Notification{
+						Title: notification.Title,
+						Body:  notification.Message,
+					},
 					Data: map[string]string{
 						"title":      notification.Title,
 						"body":       notification.Message,

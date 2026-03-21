@@ -20,4 +20,5 @@ func NewConsumerWorker(
 func (s *ConsumerWorker) RunConsumers(ctx context.Context) {
 	go s.interfaceModule.ConsumerModule.NotificationConsumer.ScheduledNotificationConsume(ctx)
 	go s.interfaceModule.ConsumerModule.GenerationWorkConsumer.WorkGenerationConsume(ctx)
+	go s.interfaceModule.ConsumerModule.TeamConsumer.TeamConsume(ctx)
 }

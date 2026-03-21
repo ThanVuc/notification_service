@@ -13,6 +13,7 @@ const (
 	// Feature
 	SCHEDULED_NOTIFICATION = "scheduled_notification"
 	WORK_GENERATION        = "generate_work"
+	TEAM                   = "team"
 
 	// Common
 	EXCHANGE    = "exchange"
@@ -41,6 +42,13 @@ var (
 		WORK_GENERATION,
 		EXCHANGE,
 	))
+
+	TEAM_EXCHANGE eventbus.ExchangeName = eventbus.ExchangeName(fmt.Sprintf(
+		"%s_%s_%s",
+		NOTIFICATION_SERVICE,
+		TEAM,
+		EXCHANGE,
+	))
 )
 
 // Queue
@@ -58,6 +66,13 @@ var (
 		WORK_GENERATION,
 		QUEUE,
 	)
+
+	TEAM_QUEUE = fmt.Sprintf(
+		"%s_%s_%s",
+		NOTIFICATION_SERVICE,
+		TEAM,
+		QUEUE,
+	)
 )
 
 // Routing Key
@@ -73,6 +88,12 @@ var (
 		"%s_%s",
 		NOTIFICATION_SERVICE,
 		WORK_GENERATION,
+	)
+
+	TEAM_ROUTING_KEY = fmt.Sprintf(
+		"%s_%s",
+		NOTIFICATION_SERVICE,
+		TEAM,
 	)
 )
 
