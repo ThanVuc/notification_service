@@ -41,4 +41,10 @@ func (s *Worker) RunWorkers(ctx context.Context, wg *sync.WaitGroup) {
 			s.interfaceModule.WorkerModule.EmailNotificationWorker.Start(ctx)
 		}()
 	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		s.interfaceModule.WorkerModule.DirectEmailWorker.Start(ctx)
+	}()
 }

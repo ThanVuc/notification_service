@@ -15,12 +15,12 @@ type Notification struct {
 	ID              bson.ObjectID `bson:"_id,omitempty" json:"id"`
 	Title           string        `bson:"title" json:"title"`
 	Message         string        `bson:"message" json:"message"`
-	Link            *string       `bson:"link" json:"link"`
+	Link            *string       `bson:"link,omitempty" json:"link,omitempty"`
 	SenderId        string        `bson:"sender_id" json:"sender_id"`
 	ReceiverIds     []string      `bson:"receiver_ids" json:"receiver_ids"`
 	IsRead          bool          `bson:"is_read" json:"is_read"`
-	TriggerAt       *time.Time    `bson:"trigger_at" json:"trigger_at"`
-	ImgUrl          *string       `bson:"img_url" json:"img_url"`
+	TriggerAt       *time.Time    `bson:"trigger_at,omitempty" json:"trigger_at,omitempty"`
+	ImgUrl          *string       `bson:"img_url,omitempty" json:"img_url,omitempty"`
 	IsSendMail      bool          `bson:"is_email_sent" json:"is_email_sent"`
 	IsActive        bool          `bson:"is_active" json:"is_active"`
 	CreatedAt       time.Time     `bson:"created_at" json:"created_at"`
@@ -42,7 +42,7 @@ func CreateNotificationCollection(
 	notificationValidator := bson.M{
 		"$jsonSchema": bson.M{
 			"bsonType": "object",
-			"required": []string{"message", "sender_id", "receiver_ids", "created_at", "updated_at"},
+			"required": []string{"message", "created_at", "updated_at"},
 			"properties": bson.M{
 				"_id": bson.M{
 					"bsonType":    []string{"objectId"},
@@ -53,7 +53,7 @@ func CreateNotificationCollection(
 					"description": "Notification message",
 				},
 				"link": bson.M{
-					"bsonType":    "string",
+					"bsonType":    []string{"string", "null"},
 					"description": "Notification link",
 				},
 				"sender_id": bson.M{

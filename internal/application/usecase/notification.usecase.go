@@ -245,11 +245,6 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 		return rabbitmq.NackDiscard
 	}
 
-	if len(teamMessage.ReceiverIDs) == 0 {
-		n.logger.Warn("No receiver IDs found for team notification", "")
-		return rabbitmq.Ack
-	}
-
 	now := time.Now().UTC()
 	notificationEntity := &entity.Notification{
 		ID:              bson.NewObjectID(),
@@ -273,6 +268,21 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 	if err := n.notificationRepo.UpsertNotification(ctx, notificationEntity); err != nil {
 		n.logger.Error("Failed to save team notification", "", zap.Error(err))
 		return rabbitmq.NackDiscard
+	}
+
+	if len(teamMessage.ReceiverIDs) == 0 {
+		if teamMessage.Metadata.IsSentMail && len(teamMessage.Metadata.NonExistentReceivers) > 0 {
+			directEmailJob := base.NewNotificationJob(
+				base.WithNotificationID(notificationEntity.ID.Hex()),
+				base.WithDirectEmails(teamMessage.Metadata.NonExistentReceivers),
+			)
+			if !n.enqueueJob(ctx, n.dispatcher.DirectEmailChan, directEmailJob, "direct_email") {
+				return rabbitmq.NackRequeue
+			}
+		}
+
+		n.logger.Warn("No receiver IDs found for team notification", "")
+		return rabbitmq.Ack
 	}
 
 	job := base.NotificationJob{NotificationID: notificationEntity.ID.Hex(), RetryCount: 0}
@@ -303,6 +313,25 @@ func (n *notificationUseCase) SendEmailNotifications(ctx context.Context) error 
 
 			if err := n.processEmailJob(ctx, job); err != nil {
 				n.logger.Error("Failed to process email notification job", "", zap.Error(err), zap.String("notification_id", job.NotificationID))
+			}
+		}
+	}
+}
+
+func (n *notificationUseCase) SendDirectEmailNotifications(ctx context.Context) error {
+	for {
+		select {
+		case <-ctx.Done():
+			n.logger.Info("Direct email notification worker stopped", "")
+			return nil
+		case job, ok := <-n.dispatcher.DirectEmailChan:
+			if !ok {
+				n.logger.Info("Direct email notification channel closed", "")
+				return nil
+			}
+
+			if err := n.processDirectEmailJob(ctx, job); err != nil {
+				n.logger.Error("Failed to process direct email notification job", "", zap.Error(err))
 			}
 		}
 	}
@@ -350,6 +379,11 @@ func (n *notificationUseCase) enqueueJob(ctx context.Context, ch chan base.Notif
 }
 
 func (n *notificationUseCase) processEmailJob(ctx context.Context, job base.NotificationJob) error {
+	if job.NotificationID == "" {
+		n.logger.Warn("Skip email job with empty notification id", "")
+		return nil
+	}
+
 	notification, err := n.notificationRepo.GetNotificationsByID(ctx, job.NotificationID)
 	if err != nil {
 		return err
@@ -375,6 +409,38 @@ func (n *notificationUseCase) processEmailJob(ctx context.Context, job base.Noti
 			},
 		); err != nil {
 			n.logger.Error("Failed to send email notification", "", zap.Error(err), zap.String("notification_id", job.NotificationID), zap.String("receiver_id", user.UserID))
+		}
+	}
+
+	return nil
+}
+
+func (n *notificationUseCase) processDirectEmailJob(ctx context.Context, job base.NotificationJob) error {
+	if job.NotificationID == "" {
+		n.logger.Warn("Skip direct email job with empty notification id", "")
+		return nil
+	}
+
+	notification, err := n.notificationRepo.GetNotificationsByID(ctx, job.NotificationID)
+	if err != nil {
+		return err
+	}
+
+	for _, receiverEmail := range job.DirectEmails {
+		if receiverEmail == "" {
+			continue
+		}
+
+		if err := n.emailHelper.SendScheduledWorkEmail(
+			receiverEmail,
+			app_model.EmailData{
+				Title:      notification.Title,
+				Message:    notification.Message,
+				Link:       utils.SafeString(notification.Link),
+				ButtonText: "Xem chi tiết",
+			},
+		); err != nil {
+			n.logger.Error("Failed to send direct email notification", "", zap.Error(err), zap.String("receiver_email", receiverEmail), zap.String("notification_id", job.NotificationID))
 		}
 	}
 
