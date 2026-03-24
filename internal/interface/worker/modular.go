@@ -9,6 +9,7 @@ type WorkerModule struct {
 	ScheduledNotificationWorker *ScheduledNotificationWorker
 	AppNotificationWorker       *AppNotificationWorker
 	EmailNotificationWorker     *EmailNotificationWorker
+	DirectEmailWorker           *DirectEmailWorker
 }
 
 func NewWorkerModule(
@@ -30,9 +31,15 @@ func NewWorkerModule(
 		infrastructureModule.BaseModule.Logger,
 	)
 
+	DirectEmailWorker := NewDirectEmailWorker(
+		applicationModule.UsecaseModular.NotificationUseCase,
+		infrastructureModule.BaseModule.Logger,
+	)
+
 	return &WorkerModule{
 		ScheduledNotificationWorker: ScheduledNotificationWorker,
 		AppNotificationWorker:       AppNotificationWorker,
 		EmailNotificationWorker:     EmailNotificationWorker,
+		DirectEmailWorker:           DirectEmailWorker,
 	}
 }

@@ -25,6 +25,7 @@ type (
 		ProcessDeleteOldNotifications(ctx context.Context) error
 		ConsumeWorkGeneration(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 		SendEmailNotifications(ctx context.Context) error
+		SendDirectEmailNotifications(ctx context.Context) error
 		SendAppNotifications(ctx context.Context) error
 		ConsumeTeamNotification(ctx context.Context, d rabbitmq.Delivery) rabbitmq.Action
 	}
