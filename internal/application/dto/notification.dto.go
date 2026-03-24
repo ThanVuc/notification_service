@@ -30,5 +30,6 @@ type TeamNotificationMessagePayload struct {
 }
 
 type TeamNotificationMessageMetadata struct {
-	IsSentMail bool `json:"is_sent_mail" bson:"is_sent_mail"`
+	IsSentMail           bool     `json:"is_sent_mail" bson:"is_sent_mail"`
+	NonExistentReceivers []string `json:"non_existent_receivers,omitempty" bson:"non_existent_receivers,omitempty"`
 }
