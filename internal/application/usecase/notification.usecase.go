@@ -245,6 +245,11 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 		return rabbitmq.NackDiscard
 	}
 
+	receiverIDs := teamMessage.ReceiverIDs
+	if receiverIDs == nil {
+	    receiverIDs = []string{}
+	}
+
 	now := time.Now().UTC()
 	notificationEntity := &entity.Notification{
 		ID:              bson.NewObjectID(),
