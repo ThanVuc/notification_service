@@ -132,11 +132,6 @@ func (n *notificationUseCase) ConsumeWorkGeneration(ctx context.Context, d rabbi
 		return rabbitmq.NackDiscard
 	}
 
-	receiverIDs := teamMessage.ReceiverIDs
-	if receiverIDs == nil {
-	    receiverIDs = []string{}
-	}
-
 	// build notification entities
 	now := time.Now().UTC()
 	notificationEntity := &entity.Notification{
@@ -248,6 +243,11 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 	if err != nil {
 		n.logger.Error("Failed to decode team notification message", "", zap.Error(err))
 		return rabbitmq.NackDiscard
+	}
+
+	receiverIDs := teamMessage.ReceiverIDs
+	if receiverIDs == nil {
+	    receiverIDs = []string{}
 	}
 
 	now := time.Now().UTC()
