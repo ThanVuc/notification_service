@@ -132,6 +132,11 @@ func (n *notificationUseCase) ConsumeWorkGeneration(ctx context.Context, d rabbi
 		return rabbitmq.NackDiscard
 	}
 
+	receiverIDs := teamMessage.ReceiverIDs
+	if receiverIDs == nil {
+	    receiverIDs = []string{}
+	}
+
 	// build notification entities
 	now := time.Now().UTC()
 	notificationEntity := &entity.Notification{
