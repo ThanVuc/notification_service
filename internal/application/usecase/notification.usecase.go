@@ -247,7 +247,7 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 
 	receiverIDs := teamMessage.ReceiverIDs
 	if receiverIDs == nil {
-	    receiverIDs = []string{}
+		receiverIDs = []string{}
 	}
 
 	now := time.Now().UTC()
@@ -257,7 +257,7 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 		Message:         teamMessage.Payload.Message,
 		Link:            teamMessage.Payload.Link,
 		SenderId:        teamMessage.SenderID,
-		ReceiverIds:     teamMessage.ReceiverIDs,
+		ReceiverIds:     receiverIDs,
 		IsRead:          false,
 		TriggerAt:       &now,
 		ImgUrl:          teamMessage.Payload.ImageURL,
@@ -275,7 +275,7 @@ func (n *notificationUseCase) ConsumeTeamNotification(ctx context.Context, d rab
 		return rabbitmq.NackDiscard
 	}
 
-	if len(teamMessage.ReceiverIDs) == 0 {
+	if len(receiverIDs) == 0 {
 		if teamMessage.Metadata.IsSentMail && len(teamMessage.Metadata.NonExistentReceivers) > 0 {
 			directEmailJob := base.NewNotificationJob(
 				base.WithNotificationID(notificationEntity.ID.Hex()),
