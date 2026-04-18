@@ -4,6 +4,7 @@ import (
 	"context"
 	"notification_service/internal/core/constant"
 	"notification_service/internal/core/entity"
+	"time"
 
 	"github.com/thanvuc/go-core-lib/log"
 	"github.com/thanvuc/go-core-lib/mongolib"
@@ -18,21 +19,36 @@ type userNotificationRepo struct {
 
 func (r *userNotificationRepo) UpsertUserNotification(ctx context.Context, user *entity.User) error {
 	collection := r.mongoConnector.GetCollection(constant.CollectionUser)
-	filter := bson.M{
-		"user_id":   user.UserID,
-		"device_id": user.DeviceID,
+
+	now := time.Now()
+
+	// 1. Remove token from other users
+	_, err := collection.DeleteMany(ctx, bson.M{
+		"fcm_token": user.FCMToken,
+		"user_id":   bson.M{"$ne": user.UserID},
+	})
+	if err != nil {
+		return err
 	}
+
+	// 2. Upsert by fcm_token
+	filter := bson.M{
+		"fcm_token": user.FCMToken,
+	}
+
 	update := bson.M{
 		"$set": bson.M{
-			"fcm_token":  user.FCMToken,
-			"updated_at": user.UpdatedAt,
+			"user_id":    user.UserID,
+			"device_id":  user.DeviceID,
 			"email":      user.Email,
+			"updated_at": now,
 		},
 		"$setOnInsert": bson.M{
 			"created_at": user.CreatedAt,
 		},
 	}
-	_, err := collection.UpdateOne(ctx, filter, update, options.UpdateOne().SetUpsert(true))
+
+	_, err = collection.UpdateOne(ctx, filter, update, options.UpdateOne().SetUpsert(true))
 	return err
 }
 
